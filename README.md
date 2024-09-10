@@ -4,11 +4,9 @@ Data and analysis scripts for "A cryptic role for reciprocal helping in a cooper
 
 # Folders
 1. **data**
-
    Cleaned data can be found here.
 
 3. **code**
-
    Scripts for all analyses can be found here.
 
 # Contact
