@@ -8,8 +8,6 @@ rm(list=ls())
 # load packages
 library(tidyverse)
 
-setwd("/Users/alexisearl/Library/CloudStorage/GoogleDrive-ade2102@columbia.edu/My Drive/PhD/Chapter 1/manuscript/Reciprocal_helping_and_kin_bias_in_superb_starlings/output")
-
 # get helping observations
 d <- read.csv("daily_helping.csv")
 
