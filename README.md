@@ -14,31 +14,7 @@ Identifying the mechanisms that underlie cooperation is a fundamental question i
 
 - ```daily_helping.csv``` contains information on observations of superb starlings. Columns include: (A) breeding_season (the year followed by whether it was the long rains (LR) or short rains (SR) rainy season), (B) date (month/day/year), (C) group (social group identity), (D) helper (individual identity of the helper observed at the nest), (E) father (identity of the father at that nest), (F) mother (identity of the mother at that nest), (G) nest identity, (H) help (minutes observed helping that nest that day), (I) sample.duration (minutes of sampling effort for each date and nest), (J) mom.dyad (the identity of the helper and the identity of the mother, in alphanumeric order), (K) dad.dyad (the identity of the helper and the identity of the father, in alphanumeric order), (L) kinship.mom (pedigree-based kinship between helper and mother), (M) kinship.dad (pedigree-based kinship between helper and father), (N) kinship.max (highest of pedigree-based kinship between helper and either parent), (O) microsat.kinship.mom (microsatellite-based kinship between helper and mother), (P) microsat.kinship.dad (microsatellite-based kinship between helper and father), (Q) microsat.kinship.max (highest of microsatellite-based kinship between helper and either parent), (R) helper.sex (M for male and F for female), (S) helper.dispersal (the helper's dispersal history, i.e., whether they immigrated (I) from another social group, remained as a "resident" in their natal group (N), or whether their dispersal history is unknown because they already existed (EX) in the population at the beginning of the longterm study), (T) helping.rate (help divided by sample.duration), (U) reciprocal.help.mom (mean dyadic helping rate from mother to current helper), (V) reciprocal.help.dad (mean dyadic helping rate from father to current helper), (W)reciprocal.help.max (maximum mean dyadic helping rate from either parent at that nest to current helper), (X) reciprocal.help (binary indicating whether reciprocal helping occurred between that helper and either of the two parents)
 
-* ```dyads.csv``` contains information on the relationships between pairs of superb starlings, i.e., the "helper" and "receiver" (the breeder receiving help).
-
-  Columns include:
-  
-  (A) identity of the helper,
-  
-  (B) identity of the receiver of help (i.e., the breeder),
-  
-  (C) sex (M for male and F for female) of the helper,
-  
-  (D) "helper.type", which indicates the helper's dispersal history (immigrant or resident) and their sex,
-  
-  (E) receiver (breeder) sex (M for male and F for female),
-  
-  (F) kinship, which indicates the pairwise relatedness of the dyad,
-  
-  (G) help.rate, which indicates the rate of helping from the helper to the receiver (i.e., mean of dyadic daily helping divided by daily sample duration),
-  
-  (H) dyad (the identity of the helper and the identity of the receiver),
-  
-  (I) reciprocal.dyad (the identities of the individuals in the dyad but in the reverse order),
-  
-  (J) udyad (undirected dyad label),
-  
-  (K) reciprocal.help.rate, which indicates the help rate from the individual who is currently the receiver to the current helper
+* ```dyads.csv``` contains information on the relationships between pairs of superb starlings, i.e., the "helper" and "receiver" (the breeder receiving help). Columns include: (A) identity of the helper, (B) identity of the receiver of help (i.e., the breeder), (C) sex (M for male and F for female) of the helper, (D) "helper.type", which indicates the helper's dispersal history (immigrant or resident) and their sex, (E) receiver (breeder) sex (M for male and F for female), (F) kinship, which indicates the pairwise relatedness of the dyad, (G) help.rate, which indicates the rate of helping from the helper to the receiver (i.e., mean of dyadic daily helping divided by daily sample duration), (H) dyad (the identity of the helper and the identity of the receiver), (I) reciprocal.dyad (the identities of the individuals in the dyad but in the reverse order), (J) udyad (undirected dyad label), (K) reciprocal.help.rate, which indicates the help rate from the individual who is currently the receiver to the current helper
 
 3. **code**
 
