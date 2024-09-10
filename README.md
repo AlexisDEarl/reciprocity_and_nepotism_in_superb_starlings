@@ -1,3 +1,5 @@
 # reciprocity_and_nepotism_in_superb_starlings
 
-Analyses of the influence of reciprocal helping and nepotism on helping behavior of superb starlings.
+Data and analysis scripts for "A cryptic role for reciprocal helping in a cooperatively breeding
+
+bird"
