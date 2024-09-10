@@ -1,11 +1,8 @@
-# Reciprocal helping and nepotism in superb starlings
+# Test of reciprocal helping bias and nepotism in helping decisions of superb starlings
 # Alexis Earl, ade2102@columbia.edu
 # Gerry Carter, gcarter1640@gmail.com
 
 # Do helpers help kin nests more than they help nonkin nests when they have the option to help kin and nonkin simultaneously?
-
-# set working directory
-setwd("/Users/alexisearl/Library/CloudStorage/GoogleDrive-ade2102@columbia.edu/My Drive/PhD/Chapter 1/manuscript/Reciprocal_helping_and_kin_bias_in_superb_starlings/output")
 
 # clear workspace
 rm(list=ls())
