@@ -3,10 +3,12 @@
 Data and analysis scripts for "A cryptic role for reciprocal helping in a cooperatively breeding bird"
 
 # Folders
-1. data
+1. **data**
+
    Cleaned data can be found here.
 
-2. code
+3. **code**
+
    Scripts for all analyses can be found here.
 
 # Contact
