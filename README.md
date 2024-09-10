@@ -54,15 +54,15 @@ Identifying the mechanisms that underlie cooperation is a fundamental question i
   
   (S) helper.dispersal (the helper's dispersal history, i.e., whether they immigrated (I) from another social group, remained as a "resident" in their natal group (N), or whether their dispersal history is unknown because they already existed (EX) in the population at the beginning of the longterm study),
   
-  (T) helping.rate,
+  (T) helping.rate (help divided by sample.duration),
   
-  (U) reciprocal.help.mom,
+  (U) reciprocal.help.mom (mean dyadic helping rate from mother to current helper),
   
-  (V) reciprocal.help.dad,
+  (V) reciprocal.help.dad (mean dyadic helping rate from father to current helper),
   
-  (W)reciprocal.help.max,
+  (W)reciprocal.help.max (maximum mean dyadic helping rate from either parent at that nest to current helper),
   
-  (X) reciprocal.help
+  (X) reciprocal.help (binary indicating whether reciprocal helping occurred between that helper and either of the two parents)
 
 * ```dyads.csv``` contains information on the relationships between pairs of superb starlings, i.e., the "helper" and "receiver" (the breeder receiving help).
 
