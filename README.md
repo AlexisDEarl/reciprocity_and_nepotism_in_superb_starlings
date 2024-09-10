@@ -12,7 +12,11 @@ Identifying the mechanisms that underlie cooperation is a fundamental question i
 
    Cleaned data can be found here.
 
-2. **code**
+- ```daily_helping.csv``` contains information on observations of superb starlings. Columns include: (A) breeding_season, (B) date, (C) group, (D) helper, (E) father, (F)	mother, (G)	nest, (H) help, (I) sample.duration, (J)	mom.dyad, (K) dad.dyad, (L) kinship.mom, (M)	kinship.dad, (N) kinship.max, (O) microsat.kinship.mom, (P) microsat.kinship.dad, (Q) microsat.kinship.max, (R) helper.sex, (S) helper.dispersal,	(T) helping.rate, (U) reciprocal.help.mom, (V) reciprocal.help.dad, (W) reciprocal.help.max, (X) reciprocal.help.
+
+* ```dyads.csv``` contains information on the relationships between pairs of superb starlings, i.e., the "helper" and "receiver" (the breeder receiving help). Columns include: (A) identity of the helper, (B) identity of the receiver of help (i.e., the breeder), (C) sex (M for male and F for female) of the helper, (D) "helper.type", which indicates the helper's dispersal history (immigrant or resident) and their sex, (E) receiver (breeder) sex (M for male and F for female), (F) kinship, which indicates the pairwise relatedness of the dyad, (G) help.rate, which indicates the rate of helping from the helper to the receiver (i.e., mean of dyadic daily helping divided by daily sample duration), (H) dyad (the identity of the helper and the identity of the receiver), (I) reciprocal.dyad (the identities of the individuals in the dyad but in the reverse order), (J) udyad (undirected dyad label), (K) reciprocal.help.rate, which indicates the help rate from the individual who is currently the receiver to the current helper
+
+3. **code**
 
    Scripts for all analyses can be found here.
 
