@@ -30,29 +30,29 @@ Identifying the mechanisms that underlie cooperation is a fundamental question i
   
   (G)	nest identity,
   
-  (H) help,
+  (H) help (minutes observed helping that nest that day),
   
-  (I) sample.duration,
+  (I) sample.duration (minutes of sampling effort for each date and nest),
   
-  (J)	mom.dyad,
+  (J)	mom.dyad (the identity of the helper and the identity of the mother, in alphanumeric order),
   
-  (K) dad.dyad,
+  (K) dad.dyad (the identity of the helper and the identity of the father, in alphanumeric order),
   
-  (L) kinship.mom,
+  (L) kinship.mom (pedigree-based kinship between helper and mother),
   
-  (M)	kinship.dad,
+  (M)	kinship.dad (pedigree-based kinship between helper and father),
   
-  (N) kinship.max,
+  (N) kinship.max (highest of pedigree-based kinship between helper and either parent),
   
-  (O) microsat.kinship.mom,
+  (O) microsat.kinship.mom (microsatellite-based kinship between helper and mother),
   
-  (P) microsat.kinship.dad,
+  (P) microsat.kinship.dad (microsatellite-based kinship between helper and father),
   
-  (Q) microsat.kinship.max,
+  (Q) microsat.kinship.max (highest of microsatellite-based kinship between helper and either parent),
   
-  (R) helper.sex,
+  (R) helper.sex (M for male and F for female),
   
-  (S) helper.dispersal,
+  (S) helper.dispersal (the helper's dispersal history, i.e., whether they immigrated (I) from another social group, remained as a "resident" in their natal group (N), or whether their dispersal history is unknown because they already existed (EX) in the population at the beginning of the longterm study),
   
   (T) helping.rate,
   
