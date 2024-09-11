@@ -4,9 +4,6 @@
 
 # test of generalized reciprocity
 
-# set working directory
-setwd("/Users/alexisearl/Library/CloudStorage/GoogleDrive-ade2102@columbia.edu/My Drive/PhD/Chapter 1/manuscript/Reciprocal_helping_and_kin_bias_in_superb_starlings/output")
-
 # clear workspace
  rm(list=ls())
 

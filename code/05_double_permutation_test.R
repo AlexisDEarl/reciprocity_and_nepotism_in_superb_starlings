@@ -4,9 +4,6 @@
 
 # double permutation test
 
-# set working directory
-setwd("/Users/alexisearl/Library/CloudStorage/GoogleDrive-ade2102@columbia.edu/My Drive/PhD/Chapter 1/manuscript/Reciprocal_helping_and_kin_bias_in_superb_starlings/output")
-
 # clear workspace
 rm(list=ls())
 
@@ -21,7 +18,6 @@ library(asnipe)
 library(boot)
 library(patchwork)
 library(ggrepel)
-
 
 # function to create network with missing values
 a_b_edgelist_to_matrix <- function(el=el, symbol="_", directed= T, make.NA.zero=T){
