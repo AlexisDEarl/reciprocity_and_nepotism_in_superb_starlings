@@ -4,10 +4,7 @@
 # Gerry Carter, gcarter1640@gmail.com
 
 # clear workspace
- rm(list=ls())
-
-# set working directory
- setwd("/Users/alexisearl/Library/CloudStorage/GoogleDrive-ade2102@columbia.edu/My Drive/PhD/Chapter 1/manuscript/Reciprocal_helping_and_kin_bias_in_superb_starlings")
+rm(list=ls())
 
 # load packages
 library(readxl)
@@ -20,8 +17,9 @@ library(tibble)
 library(data.table)
 library(ggplot2)
 
-# get data from script:  01-clean-data-v08.R
-d <- read.csv("output/daily_helping.csv")
+# load data
+d <- read.csv("daily_helping.csv")
+dyads<-read.csv("dyads.csv")
 
 # get breeders for each nest
 Mom<-d %>%
@@ -232,127 +230,7 @@ df1<-left_join(df,ids,by="id")
 df<-df1 %>%
   mutate(type=ifelse(!is.na(sex),paste(dispersal,sex,sep="_"),NA))
 
-length(unique(df$id))
 head(as.data.frame(df),2)
-
-# H to B relationships - i.e., do helpers consistently assist the same breeders? (count dyads columns)
-d$breeding_season<-as.factor(d$breeding_season)
-d$breeding_season.num<-as.integer(factor(d$breeding_season))
-
-H_mom<- d %>%
-  filter(help>0) %>%
-  arrange(helper,factor(breeding_season)) %>%
-  group_by(helper,mom.dyad) %>%
-  summarise(breeding_season=unique(breeding_season),
-            breeding_season.num=unique(breeding_season.num),
-            mother=unique(mother),
-            seasons_together=seq_along(breeding_season)) %>%
-  mutate(id=helper,
-         role="H",
-         dyad=mom.dyad,
-         partner=mother)
-H_mom$helper<-NULL
-H_mom$mom.dyad<-NULL
-H_mom$mother<-NULL
-
-H_dad<- d %>%
-  filter(help>0) %>%
-  arrange(helper,factor(breeding_season)) %>%
-  group_by(helper,dad.dyad) %>%
-  summarise(breeding_season=unique(breeding_season),
-            breeding_season.num=unique(breeding_season.num),
-            father=unique(father),
-            seasons_together=seq_along(breeding_season)) %>%
-  mutate(id=helper,
-         role="H",
-         dyad=dad.dyad,
-         partner=father)
-H_dad$helper<-NULL
-H_dad$dad.dyad<-NULL
-H_dad$father<-NULL
-
-soc_H<-distinct(rbind(H_mom,H_dad))
-#head(as.data.frame(soc_H),2)
-
-socH_df<-soc_H %>%
-  group_by(id,partner) %>%
-  arrange(breeding_season) %>%
-  mutate(seasons.tot.dyad=length(unique(breeding_season)),
-         season.first.dyad=min(breeding_season.num),
-         season.last.dyad=max(breeding_season.num),
-         seasons.dyad.sofar=findInterval(factor(breeding_season), unique(factor(breeding_season)))) %>%
-  ungroup() %>%
-  group_by(id,breeding_season) %>%
-  mutate(partners=length(unique(partner))) %>%
-  mutate(bond.str.top.partner=max(seasons.dyad.sofar)) %>%
-  ungroup()
-
-# B to H relationships, i.e., do breeders have consistent helpers?
-mom_H<- d %>%
-  filter(help>0) %>%
-  arrange(mother,factor(breeding_season)) %>%
-  group_by(mother,mom.dyad) %>%
-  summarise(breeding_season=unique(breeding_season),
-            breeding_season.num=unique(breeding_season.num),
-            helper=unique(helper),
-            seasons_together=seq_along(breeding_season)) %>%
-  mutate(id=mother,
-         role="B",
-         dyad=mom.dyad,
-         partner=helper)
-mom_H$helper<-NULL
-mom_H$mom.dyad<-NULL
-mom_H$mother<-NULL
-
-dad_H<- d %>%
-  filter(help>0) %>%
-  arrange(father,factor(breeding_season)) %>%
-  group_by(father,dad.dyad) %>%
-  summarise(breeding_season=unique(breeding_season),
-            breeding_season.num=unique(breeding_season.num),
-            helper=unique(helper),
-            seasons_together=seq_along(breeding_season)) %>%
-  mutate(id=father,
-         role="B",
-         dyad=dad.dyad,
-         partner=helper)
-dad_H$helper<-NULL
-dad_H$dad.dyad<-NULL
-dad_H$father<-NULL
-
-soc_B<-distinct(rbind(mom_H,dad_H))
-# head(as.data.frame(soc_B),2)
-
-socB_df<-soc_B %>%
-  group_by(id,partner) %>%
-  arrange(breeding_season) %>%
-  mutate(seasons.tot.dyad=length(unique(breeding_season)),
-         season.first.dyad=min(breeding_season.num),
-         season.last.dyad=max(breeding_season.num),
-         seasons.dyad.sofar=findInterval(factor(breeding_season), unique(factor(breeding_season)))) %>%
-  ungroup() %>%
-  group_by(id,breeding_season) %>%
-  mutate(partners=length(unique(partner))) %>%
-  mutate(bond.str.top.partner=max(seasons.dyad.sofar)) %>%
-  ungroup()
-
-# if role is H, seasons.dyad.sofar = how long you've been helping same breeder, if role is B seasons.dyad.sofar = how long been receiving help from same helper
-socH<-distinct(socH_df %>% dplyr::select(breeding_season,id,role,partners,bond.str.top.partner))
-socB<-distinct(socB_df %>% dplyr::select(breeding_season,id,role,partners,bond.str.top.partner))
-
-soc<-rbind(socH,socB)
-soc$breeding.season<-soc$breeding_season
-soc$breeding_season<-NULL
-
-df<-left_join(df,soc,by=c("id","breeding.season","role"))
-df<-df %>%
-  group_by(id) %>%
-  fill(partners, .direction = "updown") %>%
-  fill(bond.str.top.partner, .direction = "updown") %>%
-  ungroup()
-
-# save
-# write.csv(df,"output/df_09_role_switching_summary_before_excluding_any_ids.csv",row.names=FALSE)
 
 # remove individuals that were only observed at one nest ever (helping or breeding), i.e., only have one time.period in the data so no opportunity to switch or maintain their social role
 diffs_df <-
@@ -363,26 +241,17 @@ df_sample$minDiff<-NULL
 
 length(unique(df_sample$id)) # n=393 individuals (* 161 individuals were excluded because they were only observed at one nest ever )
 
-# get numeric state values for state tables (msm package) ####
-df_sample$state<-factor(df_sample$role,levels=c("NB","H","B"))
-df_sample$state.num<-as.numeric(df_sample$state)
+# calculate how many role switches for each individual across lifespan
 
 # remove individuals that we don't have full lifespan for (i.e., still alive) - individuals presumed dead if missing 5 or more breeding seasons so anyone still in the data after 2019LR is removed for this part - also, min cut-off = if individuals aren't observed more than 1 breeding season (* min cut-off was handled by diffs_df above)
-
-# calculate how many role switches for each individual across life
 full_lifetimes_all<- df_sample %>%
   group_by(id) %>%
   arrange(id,time.period) %>%
   filter(final.season.num<36) %>% # this line removes those still alive at end of study
   mutate(seasons_total=length(unique(breeding.season))) %>%
-  # filter(seasons_total>1) %>%
   mutate(role_switch = rleid(role) - 1) %>%
   ungroup()
 length(unique(full_lifetimes_all$id))
-
-num_roles_per_id_all<-full_lifetimes_all %>%
-  as_tibble() %>%
-  count(id)
 
 role.switch.count<-full_lifetimes_all %>%
   group_by(id) %>%
@@ -420,7 +289,6 @@ full_lifetimes_all<-full_lifetimes_all %>%
   group_by(id) %>%
   mutate(switch_binom=ifelse(role==lead(role),0,1)) %>%
   ungroup()
-
 
 current_B<-full_lifetimes_all %>%
   group_by(id) %>%
@@ -693,63 +561,8 @@ current_NB_sum %>%
   summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(type=="I_F"))
 # 55/85 (65%) immigrant females NB->NB at least once
 
-# count the number of transitions over time intervals, i.e. the number of starlings observed in one state followed by each other state ####
-library(msm)
-library(msmtools)
-state.table.all<-statetable.msm(state.num, id, data=full_lifetimes_all)
-state.table.all.percent<-round(prop.table(state.table.all, 2)*100,2)
-rownames(state.table.all) <- colnames(state.table.all) <- c("NBNH","H","B")
-rownames(state.table.all.percent) <- colnames(state.table.all.percent) <- c("NBNH","H","B")
-state.table.all
-state.table.all.percent
-
-state.table.if<-statetable.msm(state.num, id, data=full_lifetimes_all%>%filter(type=="I_F"))
-state.table.if.percent<-round(prop.table(state.table.if, 2)*100,2)
-rownames(state.table.if) <- colnames(state.table.if) <- c("NBNH","H","B")
-rownames(state.table.if.percent) <- colnames(state.table.if.percent) <- c("NBNH","H","B")
-state.table.if
-state.table.if.percent
-
-state.table.im<-statetable.msm(state.num, id, data=full_lifetimes_all%>%filter(type=="I_M"))
-state.table.im.percent<-round(prop.table(state.table.im, 2)*100,2)
-rownames(state.table.im) <- colnames(state.table.im) <- c("NBNH","H","B")
-rownames(state.table.im.percent) <- colnames(state.table.im.percent) <- c("NBNH","H","B")
-state.table.im
-state.table.im.percent
-
-state.table.nm<-statetable.msm(state.num, id, data=full_lifetimes_all%>%filter(type=="N_M"))
-state.table.nm.percent<-round(prop.table(state.table.nm, 2)*100,2)
-rownames(state.table.nm) <- colnames(state.table.nm) <- c("NBNH","H","B")
-rownames(state.table.nm.percent) <- colnames(state.table.nm.percent) <- c("NBNH","H","B")
-state.table.nm
-state.table.nm.percent
-
-state.table.nf<-statetable.msm(state.num, id, data=full_lifetimes_all%>%filter(type=="N_F"))
-state.table.nf.percent<-round(prop.table(state.table.nf, 2)*100,2)
-rownames(state.table.nf) <- colnames(state.table.nf) <- c("NBNH","H")
-rownames(state.table.nf.percent) <- colnames(state.table.nf.percent) <- c("NBNH","H")
-state.table.nf
-state.table.nf.percent
-
-# how much breeding/helping was done up until each season?
-df<-df %>%
-  group_by(id,breeding.season) %>%
-  mutate(breed=ifelse(role=="B",1,0),
-         help=ifelse(role=="H",1,0),
-         nbnh=ifelse(role=="NB",1,0)) %>%
-  ungroup() %>%
-  group_by(id) %>%
-  arrange(time.period) %>%
-  mutate(nbnhed=cumsum(nbnh),
-         helped=cumsum(help),
-         bred=cumsum(breed),
-         first_role=first(role)) %>%
-  ungroup()
-
 # how often does switch from B->H happen after nest failure ("redirected helping")?
 current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=T))
 current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T))
-
 current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_NB_binom,na.rm=T))
-
 current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_B_binom,na.rm=T))
