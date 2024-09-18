@@ -18,7 +18,7 @@ Identifying the mechanisms that underlie cooperation is a fundamental question i
 
 2. **code**
 
-   Scripts for all analyses can be found here.
+   Scripts for all analyses (done in R version 4.3.1) can be found here.
 
 # Contact
 If you have any questions or suggestions please feel free to open an issue on this repo or email me at ade2102@columbia.edu.
