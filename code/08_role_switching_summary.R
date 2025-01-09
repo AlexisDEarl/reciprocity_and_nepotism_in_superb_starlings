@@ -1,5 +1,5 @@
-# How common is social role switching?
-# Does role switching only happen after nest failure? ("redirected helping")
+# How common is social-role switching?
+# Does role switching only happen after nest failure ("redirected helping")?
 # Alexis Earl, ade2102@columbia.edu
 # Gerry Carter, gcarter1640@gmail.com
 
@@ -218,15 +218,28 @@ df<-df3 %>%
 
 rm(df3)
 rm(B_and_H)
-#rm(B_and_H1)
 
-# add dispersal status
-ids<-read.csv("data/individuals.csv") %>%
-  select(Individual,dispersal.status) %>%
-  rename("id"="Individual",
-         "dispersal"="dispersal.status")
+# add dispersal status back in
+# NA dispersal status means first captured or born too recently to know their dispersal status yet
+ids_helpers<-distinct(d %>%
+  select(helper,helper.dispersal) %>%
+  rename("id"="helper",
+         "dispersal"="helper.dispersal"))
+ids_moms<-data.frame(
+  id = setdiff(d$mother,d$helper),
+  dispersal = c("I","I","I")
+)
+ids_dads<-data.frame(
+  id = setdiff(d$father,d$helper),
+  dispersal = c("EX","I","I","I","EX")
+)
+ids<-rbind(ids_helpers, ids_moms, ids_dads)
+rm(ids_helpers)
+rm(ids_moms)
+rm(ids_dads)
+
 df1<-left_join(df,ids,by="id")
-
+rm(df)
 df<-df1 %>%
   mutate(type=ifelse(!is.na(sex),paste(dispersal,sex,sep="_"),NA))
 
@@ -562,7 +575,27 @@ current_NB_sum %>%
 # 55/85 (65%) immigrant females NB->NB at least once
 
 # how often does switch from B->H happen after nest failure ("redirected helping")?
-current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=T))
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T))
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_NB_binom,na.rm=T))
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_B_binom,na.rm=T))
+nest_outcomes <- as.data.frame(distinct(
+  read.csv("nest_outcomes.csv") %>%
+  mutate(nest_success_binary=ifelse(nest_success=="yes",1,0)) %>% select (nest_code_with_attempt, nest_success_binary) %>% rename(nest=nest_code_with_attempt, nest_success=nest_success_binary))) %>%
+  group_by(nest) %>%
+  filter(!(is.na(nest_success) & n() > 1)) %>%
+  ungroup()
+
+current_B1<-left_join(current_B,nest_outcomes,by="nest")
+current_B<-current_B1
+rm(current_B1)
+#current_B<-na.omit(current_B)
+
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 61/249 (24%)
+
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 91/249 (36%)
+
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 97/249 (40%)
+
+# how often does switch from B->H happen after nest success?
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 63/224 (28%)
+
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 67/224 (30%)
+
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 94/224 (42%)
