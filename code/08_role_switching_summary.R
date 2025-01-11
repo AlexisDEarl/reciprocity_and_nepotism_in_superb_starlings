@@ -585,7 +585,6 @@ nest_outcomes <- as.data.frame(distinct(
 current_B1<-left_join(current_B,nest_outcomes,by="nest")
 current_B<-current_B1
 rm(current_B1)
-#current_B<-na.omit(current_B)
 
 current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 61/249 (24%)
 
