@@ -577,7 +577,7 @@ current_NB_sum %>%
 # how often does switch from B->H happen after nest failure ("redirected helping")?
 nest_outcomes <- as.data.frame(distinct(
   read.csv("nest_outcomes.csv") %>%
-  mutate(nest_success_binary=ifelse(nest_success=="yes",1,0)) %>% select (nest_code_with_attempt, nest_success_binary) %>% rename(nest=nest_code_with_attempt, nest_success=nest_success_binary))) %>%
+  mutate(nest_success_binary=ifelse(nest_success=="yes",1,0)) %>% select (nest, nest_success_binary) %>% rename(nest_success=nest_success_binary))) %>%
   group_by(nest) %>%
   filter(!(is.na(nest_success) & n() > 1)) %>%
   ungroup()
