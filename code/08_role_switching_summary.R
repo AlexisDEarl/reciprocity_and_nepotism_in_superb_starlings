@@ -32,7 +32,6 @@ Mom$sex<-"F"
 Mom<-Mom %>%
   dplyr::select(id,
                 role,
-                # dispersal,
                 sex,
                 group,
                 breeding.season,
@@ -69,7 +68,6 @@ Helpers<-distinct(d %>%
                     filter(help>0) %>%
                     dplyr::select(helper,
                                   helper.sex,
-                                  #helper.dispersal,
                                   group,
                                   breeding_season,
                                   date,
@@ -78,7 +76,6 @@ Helpers<-distinct(d %>%
                                   father) %>%
                     rename(id=helper,
                            sex=helper.sex,
-                           #dispersal=helper.dispersal,
                            breeding.season=breeding_season) %>%
                     mutate(role="H"))
 
@@ -128,7 +125,6 @@ df<-df %>%
   mutate(roles_per_season=ifelse(is.na(roles_per_season),1,roles_per_season))
 df<-df %>%
   group_by(id) %>%
-  #fill(dispersal, .direction= "updown") %>%
   fill(sex, .direction= "updown") %>%
   fill(group, .direction= "updown")
 
@@ -152,14 +148,11 @@ df$date.first<-NULL
 df1<-df %>%
   group_by(id, breeding.season, role, nest) %>%
   summarise(
-    #dispersal=first(dispersal),
             sex=first(sex),
             group=first(group),
             date=first(date),
             mother=first(mother),
             father=first(father),
-            #fledge=last(fledge),
-            #nest_success=last(nest_success),
             roles_per_season=last(roles_per_season),
             breeding.season.num=first(breeding.season.num),
             final.season.num=first(final.season.num),
@@ -229,14 +222,10 @@ ids_moms<-data.frame(
   id = setdiff(d$mother,d$helper),
   dispersal = c("I","I","I")
 )
-ids_dads<-data.frame(
-  id = setdiff(d$father,d$helper),
-  dispersal = c("EX","I","I","I","EX")
-)
-ids<-rbind(ids_helpers, ids_moms, ids_dads)
+
+ids<-rbind(ids_helpers, ids_moms)
 rm(ids_helpers)
 rm(ids_moms)
-rm(ids_dads)
 
 df1<-left_join(df,ids,by="id")
 rm(df)
@@ -369,210 +358,38 @@ current_NB_sum<-current_NB %>%
 
 sum(current_NB_sum$switch_to_B_binom)/length(unique(current_NB_sum$id))
 
-# males (all) ####
-current_H_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_H_sum %>% filter(sex=="M"))
-# 105/161 (65%) resident males H->H at least once
-
-current_H_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_H_sum %>% filter(sex=="M"))
-# 49/161 (30%) males H->B at least once
-
-current_H_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_H_sum %>% filter(sex=="M"))
-# 103/161 (64%) males H->NB at least once
-
-current_B_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_B_sum %>% filter(sex=="M"))
-# 47/95 (50%) males B->H at least once
-
-current_B_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_B_sum %>% filter(sex=="M"))
-# 39/95 (41%) males B->B at least once
-
-current_B_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_B_sum %>% filter(sex=="M"))
-# 54/95 (57%) males B->NB at least once
-
-current_NB_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_NB_sum %>% filter(sex=="M"))
-# 61/122 (50%) males NB->B at least once
-
-current_NB_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_NB_sum %>% filter(sex=="M"))
-# 95/122 (78%) males NB->H at least once
-
-current_NB_sum %>%
-  filter(sex=="M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(sex=="M"))
-# 73/122 (60%) males NB->NB at least once
-
 # resident males ####
 current_H_sum %>%
   filter(type=="N_M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_H_sum %>% filter(type=="N_M"))
-# 50/66 (76%) resident males H->H at least once
-
-current_H_sum %>%
-  filter(type=="N_M") %>%
   summarise(sum(switch_to_B_binom))/nrow(current_H_sum %>% filter(type=="N_M"))
-# 14/66 (21%) resident males H->B at least once
-
-current_H_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_H_sum %>% filter(type=="N_M"))
-# 40/66 (61%) resident males H->NB at least once
+# 21% resident males H->B at least once
 
 current_B_sum %>%
   filter(type=="N_M") %>%
   summarise(sum(switch_to_H_binom))/nrow(current_B_sum %>% filter(type=="N_M"))
-# 10/23 (44%) resident males B->H at least once
-
-current_B_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_B_sum %>% filter(type=="N_M"))
-# 9/23 (39%) resident males B->B at least once
-
-current_B_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_B_sum %>% filter(type=="N_M"))
-# 14/23 (61%) resident males B->NB at least once
-
-current_NB_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_NB_sum %>% filter(type=="N_M"))
-# 18/43 (42%) resident males NB->B at least once
-
-current_NB_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_NB_sum %>% filter(type=="N_M"))
-# 37/43 (86%) resident males NB->H at least once
-
-current_NB_sum %>%
-  filter(type=="N_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(type=="N_M"))
-# 28/43 (65%) resident males NB->NB at least once
+# 45% resident males B->H at least once
 
 # immigrant males ####
 current_H_sum %>%
   filter(type=="I_M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_H_sum %>% filter(type=="I_M"))
-# 28/49 (57%) immigrant males H->H at least once
-
-current_H_sum %>%
-  filter(type=="I_M") %>%
   summarise(sum(switch_to_B_binom))/nrow(current_H_sum %>% filter(type=="I_M"))
-# 17/49 (35%) immigrant males H->B at least once
-
-current_H_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_H_sum %>% filter(type=="I_M"))
-# 29/49 (59%) immigrant males H->NB at least once
+# 35% immigrant males H->B at least once
 
 current_B_sum %>%
   filter(type=="I_M") %>%
   summarise(sum(switch_to_H_binom))/nrow(current_B_sum %>% filter(type=="I_M"))
-# 16/34 (47%) immigrant males B->H at least once
-
-current_B_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_B_sum %>% filter(type=="I_M"))
-# 12/34 (35%) immigrant males B->B at least once
-
-current_B_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_B_sum %>% filter(type=="I_M"))
-# 18/34 (53%) immigrant males B->NB at least once
-
-current_NB_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_NB_sum %>% filter(type=="I_M"))
-# 15/35 (43%) immigrant males NB->B at least once
-
-current_NB_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_NB_sum %>% filter(type=="I_M"))
-# 29/35 (83%) immigrant males NB->H at least once
-
-current_NB_sum %>%
-  filter(type=="I_M") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(type=="I_M"))
-# 18/35 (51%) immigrant males NB->NB at least once
-
-# resident females ####
-current_H_sum %>%
-  filter(type=="N_F") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_H_sum %>% filter(type=="N_F"))
-# 43/45 (96%) resident females H->H at least once
-
-current_H_sum %>%
-  filter(type=="N_F") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_H_sum %>% filter(type=="N_F"))
-# 15/45 (33%) resident females H->NB at least once
-
-current_NB_sum %>%
-  filter(type=="N_F") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_NB_sum %>% filter(type=="N_F"))
-# 15/15 (100%) resident females NB->H at least once
-
-current_NB_sum %>%
-  filter(type=="N_F") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(type=="N_F"))
-# 6/15 (40%) resident females NB->NB at least once
+# 46% immigrant males B->H at least once
 
 # immigrant females ####
 current_H_sum %>%
   filter(type=="I_F") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_H_sum %>% filter(type=="I_F"))
-# 37/90 (41%) immigrant females H->H at least once
-
-current_H_sum %>%
-  filter(type=="I_F") %>%
   summarise(sum(switch_to_B_binom))/nrow(current_H_sum %>% filter(type=="I_F"))
-# 33/90 (37%) immigrant females H->B at least once
-
-current_H_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_H_sum %>% filter(type=="I_F"))
-# 50/90 (56%) immigrant females H->NB at least once
+# 37% immigrant females H->B at least once
 
 current_B_sum %>%
   filter(type=="I_F") %>%
   summarise(sum(switch_to_H_binom))/nrow(current_B_sum %>% filter(type=="I_F"))
-# 38/82 (46%) immigrant females B->H at least once
-
-current_B_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_B_sum %>% filter(type=="I_F"))
-# 40/82 (49%) immigrant females B->B at least once
-
-current_B_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_B_sum %>% filter(type=="I_F"))
-# 58/82 (71%) immigrant females B->NB at least once
-
-current_NB_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_B_binom))/nrow(current_NB_sum %>% filter(type=="I_F"))
-# 54/85 (64%) immigrant females NB->B at least once
-
-current_NB_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_H_binom))/nrow(current_NB_sum %>% filter(type=="I_F"))
-# 50/85 (59%) immigrant females NB->H at least once
-
-current_NB_sum %>%
-  filter(type=="I_F") %>%
-  summarise(sum(switch_to_NB_binom))/nrow(current_NB_sum %>% filter(type=="I_F"))
-# 55/85 (65%) immigrant females NB->NB at least once
+# 47% immigrant females B->H at least once
 
 # how often does switch from B->H happen after nest failure ("redirected helping")?
 nest_outcomes <- as.data.frame(distinct(
@@ -586,15 +403,15 @@ current_B1<-left_join(current_B,nest_outcomes,by="nest")
 current_B<-current_B1
 rm(current_B1)
 
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 61/249 (24%)
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 24%
 
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 91/249 (36%)
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 36%
 
-current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 97/249 (40%)
+current_B %>% filter(nest_success==0) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 40%
 
 # how often does switch from B->H happen after nest success?
-current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 63/224 (28%)
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=T)) # B->H = 28%
 
-current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 67/224 (30%)
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 30%
 
-current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 94/224 (42%)
+current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 42%
