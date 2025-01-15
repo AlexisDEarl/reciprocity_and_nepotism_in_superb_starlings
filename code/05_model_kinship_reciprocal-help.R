@@ -1,33 +1,33 @@
-# Test of reciprocal helping bias and nepotism in helping decisions of superb starlings
+# A cryptic role for reciprocal helping in a cooperatively breeding bird
 # Alexis Earl, ade2102@columbia.edu
-# Gerry Carter, gcarter1640@gmail.com
+# Gerry Carter, gc1511@princeton.edu
 
-# fit Bayesian negative binomial models for predicting helping rates
+# This script fits Bayesian negative binomial models for predicting helping rates and saves the results.
+
+# This script takes about 1.5 hours to run on a 2021 Macbook Pro
 
 # clear workspace
 rm(list=ls())
 
+# OPTIONAL: install Bayesian packages
+#install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+options(mc.cores = parallel::detectCores())
+
 # load packages
 library(tidyverse)
-library(glmmTMB)
-library(broom.mixed)
 library(performance)
 library(patchwork)
 library(rstan)
 library(brms)
+library(tidybayes)
 
-# load Bayesian packages
-#install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-options(mc.cores = parallel::detectCores())
-
-# set timer
+# set timer to measure run time
 start <- Sys.time()
 
-# pick how fast to run models
+# set chains and chain length
 nchains = 4
 chain_length = 5000
 warmup_length = 1000
-
 
 # get helping observations
 d <-
@@ -35,39 +35,24 @@ d <-
   as_tibble() %>%
   # label helper-nest dyads
   mutate(helper_nest= paste(helper,nest)) %>%
-  # use microsat kinship for immigrants
+  # use microsatellite estimates of kinship for immigrants
   mutate(kinship.max= ifelse(helper.dispersal== "I", microsat.kinship.max, kinship.max)) %>%
+  # get observed helping and possible helping
   filter(help>=0) %>%
+  # label reciprocal help
   mutate(reciprocal.help= reciprocal.help.max>0)
 
-# function to get relative amount of variance explained by random intercepts
-get_vars <- function(fit){
-  tidy(fit,conf.int=F,exponentiate=F) %>%
-    filter(effect== "ran_pars") %>%
-    mutate(variance= round(estimate^2,digits=3)) %>%
-    dplyr::select(effect, group, variance) %>%
-    group_by(effect) %>%
-    mutate(percentage= round(100*(variance/sum(variance)),digits=3)) %>%
-    arrange(desc(percentage)) %>%
-    ungroup()
-    }
-# we will fit all random effects, and always include helper_nest, but we remove helper, nest, and group when they explained <0.001% of the variance
 
-# set colors and shapes
-colors <- c("black", "red", "darkblue")
-shapes <- c("circle", "square", "triangle")
+### KINSHIP MODEL OF HELPING ###############################################
 
-### NEPOTISM ####
+### model kin-biased helping by type----
 
-### model nepotism by type----
-
-# what is mean max kinship
+# what is mean kinship?
 mean(d$kinship.max, na.rm=T)
 
-# what is 1 std dev in kinship
+# what is 1 std dev in kinship?
 sd(d$kinship.max, na.rm=T)
-# 0.2
-
+# 0.1943897
 
 # create function to fit model
 fit_model <- function(data= data){
@@ -85,33 +70,36 @@ fit_model <- function(data= data){
       warmup = warmup_length)
 }
 
+# get observations that have kinship
 d2 <-
   d %>%
   filter(!is.na(kinship.max))
 
-# fit for all individuals
+# fit model for all birds
 fit.all <- fit_model(data= d2)
 
+# get coefficient estimates
 ci.all <-
   fixef(fit.all) %>%
   as_tibble(rownames= "name") %>%
   mutate(type= "all")
 
-
-# female immigrants
+# get observations of female immigrants
 fi <-
   d2 %>%
   filter(helper.sex== "F",
          helper.dispersal == "I")
 
+# fit model for female immigrants
 fit.fi <- fit_model(data= fi)
 
+# get coeffs
 ci.fi <-
   fixef(fit.fi) %>%
   as_tibble(rownames= "name") %>%
   mutate(type= "immigrant female")
 
-# male immigrants
+# get observations of male immigrants
 mi <-
   d2 %>%
   filter(helper.sex== "M",
@@ -124,7 +112,7 @@ ci.mi <-
   as_tibble(rownames= "name") %>%
   mutate(type= "immigrant male")
 
-# male resident
+# male residents
 mr <-
   d2 %>%
   filter(helper.sex== "M",
@@ -137,7 +125,7 @@ ci.mr <-
   as_tibble(rownames= "name") %>%
   mutate(type= "resident male")
 
-# female resident
+# female residents
 fr <-
   d2 %>%
   filter(helper.sex== "F",
@@ -191,39 +179,6 @@ results1 <-
     type == "resident male" ~ n.mr2)) %>%
   mutate(test= "nepotism")
 
-#### plot-----
-(plot1 <-
-    results1 %>%
-    filter(name != "Intercept") %>%
-    separate(type, into=c("dis", "sex"), convert=T, remove=F) %>%
-    mutate(sex= ifelse(is.na(sex), "all", sex)) %>%
-    ggplot(aes(x=Estimate, y=type, color= sex, shape= dis))+
-    geom_point(size=3)+
-    geom_errorbarh(aes(xmin=Q2.5, xmax= Q97.5, height=0.2),
-                   position = position_dodge(width = 0.5),
-                   linewidth=1)+
-    geom_vline(xintercept = 0, linetype= "dashed")+
-    ylab("")+
-    xlab("coefficient for kinship")+
-    coord_cartesian(xlim= c(-2,2))+
-    scale_color_manual(values= colors)+
-    scale_shape_manual(values= shapes)+
-    theme_classic()+
-    theme(legend.position= 'none',
-          axis.text=element_text(size=12),
-          strip.text = element_text(size=12, hjust=0),
-          strip.background = element_blank()))
-plot1
-
-ggsave(
-  "results/nepotism by type.pdf",
-  plot = plot1,
-  scale = 1,
-  width = 6,
-  height = 2.5,
-  units = c("in", "cm", "mm", "px"),
-  dpi = 600)
-
 #### get summary-----------------
 
 s.all <-
@@ -256,17 +211,47 @@ s.fr <-
   mutate(sample = "resident females") %>%
   mutate(model = 'nepotism')
 
-sum1 <-
-  rbind(s.all, s.fi, s.mi, s.mr, s.fr)
+# save summary of models
+sum1 <- rbind(s.all, s.fi, s.mi, s.mr, s.fr)
 
 # save models
 nepotism.models <- list(fit.all, fit.mi, fit.fi, fit.mr, fit.fr)
+
+#### get samples from posterior distribution-------
+pk.all <-
+  fit.all %>%
+  spread_draws(b_scalekinship.max) %>%
+  mutate(model = "Kinship both both") %>%
+  pivot_longer(b_scalekinship.max, names_to = 'term', values_to= 'coeff')
+pk.fi <-
+  fit.fi %>%
+  spread_draws(b_scalekinship.max) %>%
+  mutate(model = "Kinship immigrant female") %>%
+  pivot_longer(b_scalekinship.max, names_to = 'term', values_to= 'coeff')
+pk.mi <-
+  fit.mi %>%
+  spread_draws(b_scalekinship.max) %>%
+  mutate(model = "Kinship immigrant male") %>%
+  pivot_longer(b_scalekinship.max, names_to = 'term', values_to= 'coeff')
+pk.mr <-
+  fit.mr %>%
+  spread_draws(b_scalekinship.max) %>%
+  mutate(model = "Kinship resident male") %>%
+  pivot_longer(b_scalekinship.max, names_to = 'term', values_to= 'coeff')
+pk.fr <-
+  fit.fr %>%
+  spread_draws(b_scalekinship.max) %>%
+  mutate(model = "Kinship resident female") %>%
+  pivot_longer(b_scalekinship.max, names_to = 'term', values_to= 'coeff')
+
+# compile posterior distributions
+(all_post.kinship <- rbind(pk.all,pk.fi, pk.mi, pk.fr, pk.mr))
 
 # erase model fits
 rm(s.all, s.fi, s.mi, s.mr, s.fr)
 rm(ci.all, ci.mi, ci.fi, ci.mr, ci.fr, fit.all, fit.mi, fit.fi, fit.mr, fit.fr)
 
-### RECIPROCITY ##############################################################################
+### RECIPROCAL HELP MODEL ###############################################
 # create function to fit model
 fit_model <- function(data= data){
   brm(help ~
@@ -283,11 +268,12 @@ fit_model <- function(data= data){
       warmup = warmup_length)
 }
 
+# get observations where reciprocal help was possible to observe
 d2 <-
   d %>%
   filter(!is.na(reciprocal.help))
 
-# fit for all individuals
+# fit model for all birds
 fit.all <- fit_model(data= d2)
 
 ci.all <-
@@ -321,7 +307,7 @@ ci.mi <-
   as_tibble(rownames= "name") %>%
   mutate(type= "immigrant male")
 
-# male resident
+# male residents
 mr <-
   d2 %>%
   filter(helper.sex== "M",
@@ -346,7 +332,7 @@ n.fi <- nrow(fi)
 n.mr <- nrow(mr)
 n.fr <- nrow(fr)
 
-# get number of birds
+# get number of individuals
 n.all2 <- NA
 n.mi2 <- NA
 n.fi2 <- NA
@@ -375,39 +361,6 @@ results2 <-
     type == "resident male" ~ n.mr2)) %>%
   mutate(test= "reciprocity")
 
-#### plot --------------
-(plot2 <-
-    results2 %>%
-    filter(name != "Intercept") %>%
-    separate(type, into=c("dis", "sex"), convert=T, remove=F) %>%
-    mutate(sex= ifelse(is.na(sex), "all", sex)) %>%
-    ggplot(aes(x=Estimate, y=type, color= sex, shape= dis))+
-    geom_point(size=3)+
-    geom_errorbarh(aes(xmin=Q2.5, xmax= Q97.5, height=0.2),
-                   linewidth=1)+
-    geom_vline(xintercept = 0, linetype= "dashed")+
-    ylab("")+
-    xlab("coefficient for reciprocal help")+
-    coord_cartesian(xlim= c(-3,3))+
-    scale_color_manual(values= colors)+
-    scale_shape_manual(values= shapes)+
-    theme_classic()+
-    theme(legend.position= 'none',
-          axis.text=element_text(size=12),
-          strip.text = element_text(size=12, hjust=0),
-          strip.background = element_blank()))
-plot2
-
-
-ggsave(
-  "results/reciprocity by type.pdf",
-  plot = plot2,
-  scale = 1,
-  width = 6,
-  height = 2.5,
-  units = c("in", "cm", "mm", "px"),
-  dpi = 600)
-
 #### get summary-----------------
 
 # function to get summary
@@ -435,17 +388,42 @@ s.mr <-
   mutate(sample = "resident males") %>%
   mutate(model = 'reciprocity')
 
-sum2 <-
-  rbind(s.all, s.fi, s.mi, s.mr)
+# get model summaries
+sum2 <- rbind(s.all, s.fi, s.mi, s.mr)
 
 # save models
 reciprocity.models <- list(fit.all, fit.mi, fit.fi, fit.mr)
+
+#### get samples from posterior distribution-------
+p.all <-
+  fit.all %>%
+  spread_draws(b_reciprocal.helpTRUE) %>%
+  mutate(model = "Reciprocal_help both both") %>%
+  pivot_longer(b_reciprocal.helpTRUE, names_to = 'term', values_to= 'coeff')
+p.fi <-
+  fit.fi %>%
+  spread_draws(b_reciprocal.helpTRUE) %>%
+  mutate(model = "Reciprocal_help immigrant female") %>%
+  pivot_longer(b_reciprocal.helpTRUE, names_to = 'term', values_to= 'coeff')
+p.mi <-
+  fit.mi %>%
+  spread_draws(b_reciprocal.helpTRUE) %>%
+  mutate(model = "Reciprocal_help immigrant male") %>%
+  pivot_longer(b_reciprocal.helpTRUE, names_to = 'term', values_to= 'coeff')
+p.mr <-
+  fit.mr %>%
+  spread_draws(b_reciprocal.helpTRUE) %>%
+  mutate(model = "Reciprocal_help resident male") %>%
+  pivot_longer(b_reciprocal.helpTRUE, names_to = 'term', values_to= 'coeff')
+
+# compile posterior distributions
+(all_post.reciprocity <- rbind(p.all,p.fi, p.mi, p.mr))
 
 # erase model fits
 rm(s.all, s.fi, s.mi, s.mr)
 rm(ci.all, ci.mi, ci.fi, ci.mr, ci.fr, fit.all, fit.mi, fit.fi, fit.mr)
 
-### RECIPROCITY & NEPOTISM ##############################################################################
+### RECIPROCAL HELP & KINSHIP MODEL ###############################################
 
 # create function to fit model
 fit_model <- function(data= data){
@@ -464,6 +442,7 @@ fit_model <- function(data= data){
     warmup = warmup_length)
 }
 
+# get observations with both kinship and possibility of reciprocal help
 d2 <-
   d %>%
   filter(!is.na(reciprocal.help)) %>%
@@ -504,7 +483,7 @@ ci.mi <-
   as_tibble(rownames= "name") %>%
   mutate(type= "immigrant male")
 
-# male resident
+# male residents
 mr <-
   d2 %>%
   filter(helper.sex== "M",
@@ -557,84 +536,6 @@ results3 <-
     type == "resident male" ~ n.mr2)) %>%
   mutate(test= "reciprocity and nepotism")
 
-#### plot-----------------
-
-(plot3 <-
-   results3 %>%
-   filter(name == "reciprocal.helpTRUE") %>%
-   separate(type, into=c("dis", "sex"), convert=T, remove=F) %>%
-   mutate(sex= ifelse(is.na(sex), "all", sex)) %>%
-   ggplot(aes(x=Estimate, y=type, color= sex, shape= dis))+
-   geom_point(size=3)+
-   geom_errorbarh(aes(xmin=Q2.5, xmax= Q97.5, height=0.2),
-                  linewidth=1)+
-   geom_vline(xintercept = 0, linetype= "dashed")+
-   ylab("")+
-   xlab("coefficient for reciprocal help controlling for kinship")+
-   coord_cartesian(xlim= c(-3,3))+
-   scale_color_manual(values= colors)+
-   scale_shape_manual(values= shapes)+
-   theme_classic()+
-   theme(legend.position= 'none',
-         axis.text=element_text(size=12),
-         strip.text = element_text(size=12, hjust=0),
-         strip.background = element_blank()))
-plot3
-
-# include kinship coefficients?
-include_kinship <- T
-
-# to include kinship
-if(include_kinship){
-  colors2 <- c("darkgrey", colors)
-  (plot3 <-
-     results3 %>%
-     filter(name != "Intercept") %>%
-     separate(type, into=c("dis", "sex"), convert=T, remove=F) %>%
-     mutate(sex= ifelse(is.na(sex), "all", sex)) %>%
-     mutate(predictor= ifelse(name=="reciprocal.helpTRUE", "rec", "kin")) %>%
-     mutate(temp= ifelse(predictor== "rec", sex, "aa")) %>%
-     ggplot(aes(x=Estimate, y=type, color= temp, shape= dis, group= predictor))+
-     geom_point(size=3, position = position_dodge(width = 0.5))+
-     geom_errorbarh(aes(xmin=Q2.5, xmax= Q97.5, height=0.35),
-                    position = position_dodge(width = 0.5),
-                    linewidth=1)+
-     geom_vline(xintercept = 0, linetype= "dashed")+
-     ylab("")+
-     xlab("coefficient for reciprocal help controlling for kinship")+
-     coord_cartesian(xlim=c(-3,3))+
-     scale_color_manual(values= colors2)+
-     scale_shape_manual(values= shapes)+
-     theme_classic()+
-     theme(legend.position= 'none',
-           axis.text=element_text(size=12),
-           strip.text = element_text(size=12, hjust=0),
-           strip.background = element_blank()))
-}
-
-
-(plot23 <- plot2/plot3 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1)))
-
-ggsave(
-  "results/reciprocity by type controlling for kinship (SI).pdf",
-  plot = plot23,
-  scale = 1,
-  width = 6,
-  height = 5,
-  units = c("in", "cm", "mm", "px"),
-  dpi = 600)
-
-
-ggsave(
-  "results/reciprocity by type controlling for kinship (SI).pdf",
-  plot = plot3,
-  scale = 1,
-  width = 6,
-  height = 2.5,
-  units = c("in", "cm", "mm", "px"),
-  dpi = 600)
-
-
 #### get summary-----------
 s.all <-
   summary(fit.all)$fixed %>%
@@ -666,11 +567,36 @@ sum3 <-
 # save models
 reciprocity_nepotism.models <- list(fit.all, fit.mi, fit.fi, fit.mr)
 
+#### get samples from posterior distribution-------
+p.all <-
+  fit.all %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scalekinship.max) %>%
+  mutate(model = "Reciprocal_Kinship both both") %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scalekinship.max , names_to = 'term', values_to= 'coeff')
+p.fi <-
+  fit.fi %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scalekinship.max) %>%
+  mutate(model = "Reciprocal_Kinship immigrant female") %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scalekinship.max , names_to = 'term', values_to= 'coeff')
+p.mi <-
+  fit.mi %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scalekinship.max) %>%
+  mutate(model = "Reciprocal_Kinship immigrant male") %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scalekinship.max , names_to = 'term', values_to= 'coeff')
+p.mr <-
+  fit.mr %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scalekinship.max) %>%
+  mutate(model = "Reciprocal_Kinship resident male") %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scalekinship.max , names_to = 'term', values_to= 'coeff')
+
+# compile posterior distributions
+(all_post.reciprocity_kinship <- rbind(p.all,p.fi, p.mi, p.mr))
+
 # erase model fits
 rm(s.all, s.fi, s.mi, s.mr)
 rm(ci.all, ci.mi, ci.fi, ci.mr, ci.fr, fit.all, fit.mi, fit.fi, fit.mr)
 
-### INTERACTION ##############################################################################
+### INTERACTION BETWEEN RECIPROCAL AND KINSHIP MODEL ###############################################
 
 # create function to fit model
 fit_model <- function(data= data){
@@ -688,6 +614,7 @@ fit_model <- function(data= data){
       warmup = warmup_length)
 }
 
+# get observations with both kinship and possibility of reciprocal help
 d2 <-
   d %>%
   filter(!is.na(reciprocal.help)) %>%
@@ -700,7 +627,6 @@ ci.all <-
   fixef(fit.all) %>%
   as_tibble(rownames= "name") %>%
   mutate(type= "all")
-
 
 # female immigrants
 fi <-
@@ -728,7 +654,7 @@ ci.mi <-
   as_tibble(rownames= "name") %>%
   mutate(type= "immigrant male")
 
-# male resident
+# male residents
 mr <-
   d2 %>%
   filter(helper.sex== "M",
@@ -756,7 +682,7 @@ n.mi <- nrow(mi)
 n.fi <- nrow(fi)
 n.mr <- nrow(mr)
 
-# get number of birds
+# get number of individuals
 n.all2 <- NA
 n.mi2 <- NA
 n.fi2 <- NA
@@ -783,43 +709,6 @@ results4 <-
     type == "resident female" ~ n.fr2,
     type == "resident male" ~ n.mr2)) %>%
   mutate(test= "reciprocity x nepotism interaction")
-
-
-#### plot--------------------
-(plot4 <-
-    results4 %>%
-    filter(name != "Intercept") %>%
-    separate(type, into=c("dis", "sex"), convert=T, remove=F) %>%
-    mutate(sex= ifelse(is.na(sex), "all", sex)) %>%
-    mutate(predictor= ifelse(name=="reciprocal.helpTRUE:scalekinship.max",
-                             "kinship x reciprocal help interaction",
-                             "other")) %>%
-    filter(predictor== "kinship x reciprocal help interaction") %>%
-    ggplot(aes(x=Estimate, y=type, color= sex, shape= dis))+
-    geom_point(size=3)+
-   geom_errorbarh(aes(xmin=Q2.5, xmax= Q97.5, height=0.2),
-                  linewidth=1)+
-    geom_vline(xintercept = 0, linetype= "dashed")+
-    ylab("")+
-    xlab("coefficient for kinship x reciprocal help interaction")+
-    coord_cartesian(xlim=c(-3,3))+
-    scale_color_manual(values= colors)+
-    scale_shape_manual(values= shapes)+
-    theme_classic()+
-    theme(legend.position= 'none',
-          axis.text=element_text(size=12),
-          strip.text = element_text(size=12, hjust=0),
-          strip.background = element_blank()))
-plot4
-
-ggsave(
-  "results/interaction by type.pdf",
-  plot = plot4,
-  scale = 1,
-  width = 5,
-  height = 3,
-  units = c("in", "cm", "mm", "px"),
-  dpi = 600)
 
 #### get summary-----------
 s.all <-
@@ -852,15 +741,40 @@ sum4 <-
 # save models
 interaction.models <- list(fit.all, fit.mi, fit.fi, fit.mr)
 
+#### get samples from posterior distribution-------
+p.all <-
+  fit.all %>%
+  spread_draws(`b_reciprocal.helpTRUE:scalekinship.max`) %>%
+  mutate(model = "Interaction both both") %>%
+  pivot_longer(`b_reciprocal.helpTRUE:scalekinship.max`, names_to = 'term', values_to= 'coeff')
+p.fi <-
+  fit.fi %>%
+  spread_draws(`b_reciprocal.helpTRUE:scalekinship.max`) %>%
+  mutate(model = "Interaction immigrant female") %>%
+  pivot_longer(`b_reciprocal.helpTRUE:scalekinship.max`, names_to = 'term', values_to= 'coeff')
+p.mi <-
+  fit.mi %>%
+  spread_draws(`b_reciprocal.helpTRUE:scalekinship.max`) %>%
+  mutate(model = "Interaction immigrant male") %>%
+  pivot_longer(`b_reciprocal.helpTRUE:scalekinship.max`, names_to = 'term', values_to= 'coeff')
+p.mr <-
+  fit.mr %>%
+  spread_draws(`b_reciprocal.helpTRUE:scalekinship.max`) %>%
+  mutate(model = "Interaction resident male") %>%
+  pivot_longer(`b_reciprocal.helpTRUE:scalekinship.max`, names_to = 'term', values_to= 'coeff')
+
+# compile posterior distributions
+(all_post.interact <- rbind(p.all, p.fi, p.mi, p.mr))
+
 # erase model fits
 rm(s.all, s.fi, s.mi, s.mr)
 rm(ci.all, ci.mi, ci.fi, ci.mr, ci.fr, fit.all, fit.mi, fit.fi, fit.mr)
 
-# SAVE RESULTS--------
+# SAVE RESULTS FOR MAIN ANALYSIS --------
 
 # get sample sizes
 ss <-
-  rbind(results1, results2, results3,results4) %>%
+  rbind(results1, results2, results3, results4) %>%
   mutate(model = test) %>%
   mutate(sample = case_when(
     type == "immigrant male" ~ "immigrant males",
@@ -885,9 +799,107 @@ results <-
   )) %>%
   rename(Model = model, Sample = sample, Coefficient= name) %>%
   relocate(Model, Sample)
+write.csv(results, file= "model_terms.csv")
 
-write.csv(results, file= "results/model_terms.csv")
+# save posteriors for plotting
+save(all_post.kinship, all_post.reciprocity, all_post.reciprocity_kinship, all_post.interact,
+     file= "data_to_plot_model_estimates.Rdata")
 
+# OVERALL HELP RECEIVED (GENERALIZED RECIPROCITY) ####
+
+# Fit models comparing direct and "generalized" reciprocity
+
+# get mean receiving rate for each individual
+t <-
+  read.csv("dyads.csv") %>%
+  group_by(receiver) %>%
+  summarize(mean.received= mean(help.rate, na.rm=T),
+            total.received= sum(help.rate, na.rm=T)) %>%
+  rename(bird= receiver)
+
+# get helping observations
+d3 <-
+  read.csv("daily_helping.csv") %>%
+  as_tibble() %>%
+  # label helper-nest dyads
+  mutate(helper_nest= paste(helper,nest)) %>%
+  filter(help>=0) %>%
+  mutate(reciprocal.help= reciprocal.help.max>0) %>%
+  mutate(mean.received = t$mean.received[match(.$helper, t$bird)]) %>%
+  mutate(total.received = t$total.received[match(.$helper, t$bird)])
+
+
+# fit mean overall help model -----------
+fit1 <-
+  brm(help ~
+        reciprocal.help+
+        scale(mean.received) +
+        offset(log(sample.duration)) +
+        (1|helper) +
+        (1|nest)+
+        (1|helper_nest),
+      data = d3,
+      family = "negbinomial",
+      cores = nchains,
+      chains = nchains,
+      iter = chain_length,
+      warmup = warmup_length)
+
+t1 <-
+  summary(fit1)$fixed %>%
+  as_tibble(rownames= "term") %>%
+  mutate(type = 'mean.received')
+
+
+# fit total overall help model ------------
+fit2 <-
+  brm(help ~
+        reciprocal.help+
+        scale(total.received) +
+        offset(log(sample.duration)) +
+        (1|helper) +
+        (1|nest)+
+        (1|helper_nest),
+      data = d3,
+      family = "negbinomial",
+      cores = nchains,
+      chains = nchains,
+      iter = chain_length,
+      warmup = warmup_length)
+
+t2 <-
+  summary(fit2)$fixed %>%
+  as_tibble(rownames= "term") %>%
+  mutate(type = 'total.received')
+
+# compile results--------
+(gr.results <-
+   rbind(t1,t2))
+
+colnames(gr.results) <- c("term", "estimate", 'error', 'low95', 'high95', 'Rhat', 'bulk_ESS', "tail_ESS", 'type')
+
+#### get samples from posterior distribution-------
+p1 <-
+  fit1 %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scalemean.received) %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scalemean.received, names_to = 'term', values_to= 'coeff') %>%
+  mutate(model= "mean.received")
+
+p2 <-
+  fit2 %>%
+  spread_draws(b_reciprocal.helpTRUE, b_scaletotal.received) %>%
+  pivot_longer(b_reciprocal.helpTRUE:b_scaletotal.received, names_to = 'term', values_to= 'coeff') %>%
+  mutate(model= "total.received")
+
+# compile posterior distributions
+post.gr <- rbind(p1,p2)
+
+# save posteriors for plotting
+save(post.gr, file= "data_to_plot_generalized_reciprocity.Rdata")
+
+# save results----------------
+write.csv(gr.results, file= "gr.model_terms.csv")
+gr.results <- read.csv("gr.model_terms.csv")
 
 # get runtime
 end <- Sys.time()
@@ -895,11 +907,11 @@ runtime <- end - start
 runtime
 
 # save workspace
-timestamp <- substr(gsub(x=gsub(":","",Sys.time()),
-                         pattern=" ", replace="_"), start=1, stop=15)
-timestamp
-save.image(file= paste("results/model_workspace_", timestamp, ".Rdata", sep=""))
+if(TRUE){
+  timestamp <- substr(gsub(x=gsub(":","",Sys.time()),
+                           pattern=" ", replace="_"), start=1, stop=15)
+  timestamp
+  save.image(file= paste("model_workspace_", timestamp, ".Rdata", sep=""))
+}
 
 
-#load('results/model_workspace_2024-03-20_1512.Rdata')
-#

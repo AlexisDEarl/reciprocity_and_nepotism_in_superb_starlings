@@ -1,8 +1,8 @@
-# Test of reciprocal helping bias and kin bias in helping decisions of superb starlings
+# A cryptic role for reciprocal helping in a cooperatively breeding bird
 # Alexis Earl, ade2102@columbia.edu
-# Gerry Carter, gcarter1640@gmail.com
+# Gerry Carter, gc1511@princeton.edu
 
-# look at histogram for relatedness of helping events
+# This script plots histograms for relatedness between helpers and breeders
 
 # clear workspace
 rm(list=ls())
@@ -40,7 +40,7 @@ all_plot<-ggplot(dr)+
         axis.text.y = element_text(color="black", size=17, angle=0))+theme(legend.position = "none")+
   scale_x_continuous(breaks=seq(-0.25,1.0,0.25))+
   scale_y_continuous(limits=c(0,4000))+
-  geom_vline(aes(xintercept = mean(microsat.kinship.max,na.rm=TRUE)),color = "black",size=1.5,linetype="dashed") # or median(dr$microsat.kinship.max,na.rm=TRUE)
+  geom_vline(aes(xintercept = mean(microsat.kinship.max,na.rm=TRUE)),color = "black",size=1.5,linetype="dashed")
 all_plot
 
 helper_parents<-c(dr$helper,dr$mother,dr$father)
@@ -56,7 +56,7 @@ range(dr$microsat.kinship.max,na.rm=TRUE) # range of r-values between breeders a
 mean(dr$microsat.kinship.max,na.rm=TRUE) # mean of r-values between breeders and helpers
 sd(dr$microsat.kinship.max,na.rm=TRUE) # sd of r-values between breeders and helpers
 
-### by helper type
+# by helper type
 dr$type<-paste(dr$helper.dispersal,dr$helper.sex,sep="_")
 
 helper_types <- c(
@@ -113,8 +113,7 @@ N_F_plot<-ggplot(dr1_N_F)+
   theme(legend.position = "none")+
   scale_x_continuous(breaks=seq(-0.25,1.0,0.25))+
   scale_y_continuous(limits=c(0,1300))+
-  geom_vline(data=kinship.means_N_F, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed") # or median(dr$microsat.kinship.max,na.rm=TRUE)
-  #annotate(geom = 'text', label = 'C', x = -Inf, y = Inf, hjust = -0.5, vjust = 1.2,size=6)
+  geom_vline(data=kinship.means_N_F, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed")
 N_F_plot
 
 
@@ -138,8 +137,7 @@ I_F_plot<-ggplot(dr1_I_F)+
   theme(legend.position = "none")+
   scale_x_continuous(breaks=seq(-0.25,1.0,0.25))+
   scale_y_continuous(limits=c(0,1300))+
-  geom_vline(data=kinship.means_I_F, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed") # or median(dr$microsat.kinship.max,na.rm=TRUE)
-  #annotate(geom = 'text', label = 'D', x = -Inf, y = Inf, hjust = -0.5, vjust = 1.2,size=6)
+  geom_vline(data=kinship.means_I_F, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed")
 I_F_plot
 
 dr1_I_M<-dr1%>%filter(type=="I_M")
@@ -162,8 +160,7 @@ I_M_plot<-ggplot(dr1_I_M)+
   theme(legend.position = "none")+
   scale_x_continuous(breaks=seq(-0.25,1.0,0.25))+
   scale_y_continuous(limits=c(0,1300))+
-  geom_vline(data=kinship.means_I_M, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed") # or median(dr$microsat.kinship.max,na.rm=TRUE)
-  #annotate(geom = 'text', label = 'B', x = -Inf, y = Inf, hjust = -0.5, vjust = 1.2,size=6)
+  geom_vline(data=kinship.means_I_M, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed")
 I_M_plot
 
 
@@ -187,8 +184,7 @@ N_M_plot<-ggplot(dr1_N_M)+
   theme(legend.position = "none")+
   scale_x_continuous(breaks=seq(-0.25,1.0,0.25))+
   scale_y_continuous(limits=c(0,1300))+
-  geom_vline(data=kinship.means_N_M, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed") # or median(dr$microsat.kinship.max,na.rm=TRUE)
-  #annotate(geom = 'text', label = 'A', x = -Inf, y = Inf, hjust = -0.5, vjust = 1.2,size=6)
+  geom_vline(data=kinship.means_N_M, aes(xintercept = kinship.mean),color = "black",size=1.5,linetype = "dashed")
 N_M_plot
 
 
@@ -212,7 +208,6 @@ I_F_plot1<-I_F_plot+coord_cartesian(xlim = c(-0.25,1.0))
 
 # combine plots
 helper_type_plot_list<-list(N_M_plot1,I_M_plot1,N_F_plot1,I_F_plot1)
-# helper_type_plots<-plot_grid(plotlist=helper_type_plot_list, nrow = 2,ncol=2,labels=ABCD)
 helper_type_plots<-plot_grid(plotlist=helper_type_plot_list, nrow = 2,ncol=2,labels=c("B","C","D", "E"), label_fontfamily = "serif", label_fontface = "bold",label_size =24)
 
 # create common x and y labels
@@ -224,21 +219,19 @@ x.grob <- textGrob("maximum breeder-helper relatedness \n ",
 
 # add to plot
 grid.arrange(arrangeGrob(helper_type_plots, left = y.grob, bottom = x.grob))
-# save (export as image) with height 900 width 900 (maintain aspect ratio)
 
 # combine plot for all individuals with plots by helper type
-# expand xlim so same as othr plots
+# expand xlim so same as other plots
 all_plot1<-all_plot+coord_cartesian(xlim = c(-0.25,1.0))
 # add label
 all_plot2<-plot_grid(plotlist=list(all_plot1), nrow = 1,ncol=1,labels=c("A"),label_size =24, label_fontfamily = "serif", label_x = 0,
                      hjust = 0.5)
 # combine
 everything_plot<-grid.arrange(arrangeGrob(all_plot2,helper_type_plots,nrow=1,ncol=2, left = y.grob, bottom = x.grob))
-# save (export as image) with height 1000 width 2000 (do *not* maintain aspect ratio)
 
 # save plot
 ggsave(
-  "results/breeder_helper_kinship_distribution.png",
+  "breeder_helper_kinship_distribution.png",
   plot = everything_plot,
   width = 20,
   height = 10,

@@ -1,25 +1,21 @@
-# How common is social-role switching?
-# Does role switching only happen after nest failure ("redirected helping")?
+# A cryptic role for reciprocal helping in a cooperatively breeding bird
 # Alexis Earl, ade2102@columbia.edu
-# Gerry Carter, gcarter1640@gmail.com
+# Gerry Carter, gc1511@princeton.edu
+
+# This script summarizes social-role switching, examines the possibility of "redirected helping", and plots the role switching events.
 
 # clear workspace
 rm(list=ls())
 
 # load packages
-library(readxl)
 library(tidyverse)
-library(igraph)
-library(boot)
 library(patchwork)
-library(plotrix)
-library(tibble)
+library(see)
 library(data.table)
-library(ggplot2)
+library(plotrix)
 
-# load data
+# get data
 d <- read.csv("daily_helping.csv")
-dyads<-read.csv("dyads.csv")
 
 # get breeders for each nest
 Mom<-d %>%
@@ -148,16 +144,16 @@ df$date.first<-NULL
 df1<-df %>%
   group_by(id, breeding.season, role, nest) %>%
   summarise(
-            sex=first(sex),
-            group=first(group),
-            date=first(date),
-            mother=first(mother),
-            father=first(father),
-            roles_per_season=last(roles_per_season),
-            breeding.season.num=first(breeding.season.num),
-            final.season.num=first(final.season.num),
-            first.season.num=first(first.season.num),
-            seasons.since.first.obs=first(seasons.since.first.obs)) %>%
+    sex=first(sex),
+    group=first(group),
+    date=first(date),
+    mother=first(mother),
+    father=first(father),
+    roles_per_season=last(roles_per_season),
+    breeding.season.num=first(breeding.season.num),
+    final.season.num=first(final.season.num),
+    first.season.num=first(first.season.num),
+    seasons.since.first.obs=first(seasons.since.first.obs)) %>%
   ungroup()
 df1$breeding.season<-as.factor(df1$breeding.season)
 
@@ -176,7 +172,7 @@ df2 <- df1 %>%
          season.rows=seq_along(breeding.season),
          nests_per_season=length(unique(nest))) %>%
   mutate(season.portions=season.rows/season.entries) %>%
-ungroup()
+  ungroup()
 
 df3<-df2 %>%
   group_by(id) %>%
@@ -215,9 +211,9 @@ rm(B_and_H)
 # add dispersal status back in
 # NA dispersal status means first captured or born too recently to know their dispersal status yet
 ids_helpers<-distinct(d %>%
-  select(helper,helper.dispersal) %>%
-  rename("id"="helper",
-         "dispersal"="helper.dispersal"))
+                        select(helper,helper.dispersal) %>%
+                        rename("id"="helper",
+                               "dispersal"="helper.dispersal"))
 ids_moms<-data.frame(
   id = setdiff(d$mother,d$helper),
   dispersal = c("I","I","I")
@@ -278,7 +274,6 @@ sum(role.switch.count.tbl$n[role.switch.count.tbl$switch_count>1])
 summary(role.switch.count$switch_count)
 mean(role.switch.count$switch_count)
 std.error(role.switch.count$switch_count)
-sd(role.switch.count$switch_count)
 range(role.switch.count$switch_count)
 
 # Summarise role switching
@@ -312,8 +307,6 @@ current_B_sum<-current_B %>%
          switch_to_NB_binom=as.numeric(switch_to_NB>0),
          switch_to_B_binom=as.numeric(switch_to_B>0))
 
-sum(current_B_sum$switch_to_H_binom)/length(unique(current_B_sum$id))
-
 current_H<-full_lifetimes_all %>%
   group_by(id) %>%
   filter(role=="H") %>%
@@ -334,8 +327,6 @@ current_H_sum<-current_H %>%
          switch_to_NB_binom=as.numeric(switch_to_NB>0),
          switch_to_B_binom=as.numeric(switch_to_B>0))
 
-sum(current_H_sum$switch_to_B_binom)/length(unique(current_H_sum$id))
-
 current_NB<-full_lifetimes_all %>%
   group_by(id) %>%
   filter(role=="NB") %>%
@@ -355,8 +346,6 @@ current_NB_sum<-current_NB %>%
   mutate(switch_to_H_binom=as.numeric(switch_to_H>0),
          switch_to_NB_binom=as.numeric(switch_to_NB>0),
          switch_to_B_binom=as.numeric(switch_to_B>0))
-
-sum(current_NB_sum$switch_to_B_binom)/length(unique(current_NB_sum$id))
 
 # resident males ####
 current_H_sum %>%
@@ -394,7 +383,7 @@ current_B_sum %>%
 # how often does switch from B->H happen after nest failure ("redirected helping")?
 nest_outcomes <- as.data.frame(distinct(
   read.csv("nest_outcomes.csv") %>%
-  mutate(nest_success_binary=ifelse(nest_success=="yes",1,0)) %>% select (nest, nest_success_binary) %>% rename(nest_success=nest_success_binary))) %>%
+    mutate(nest_success_binary=ifelse(nest_success=="yes",1,0)) %>% select (nest, nest_success_binary) %>% rename(nest_success=nest_success_binary))) %>%
   group_by(nest) %>%
   filter(!(is.na(nest_success) & n() > 1)) %>%
   ungroup()
@@ -415,3 +404,92 @@ current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_H_binom,na.rm=
 current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_NB_binom,na.rm=T)) # B->NBNH = 30%
 
 current_B %>% filter(nest_success==1) %>% summarise(sum(switch_to_B_binom,na.rm=T)) # B->B = 42%
+
+# create role-switching data frame for plotting
+role_switchingHtoB<-current_H_sum %>%
+  filter(!dispersal=="EX") %>%
+  select(type,switch_to_B_binom) %>%
+  group_by(type)%>%
+  mutate(possible=n()) %>%
+  summarise(observed=sum(switch_to_B_binom),
+            possible=first(possible))
+role_switchingHtoB$from<-"helper"
+role_switchingHtoB$to<-"breeder"
+
+role_switchingBtoH<-current_B_sum %>%
+  filter(!dispersal=="EX") %>%
+  select(type,switch_to_H_binom) %>%
+  group_by(type)%>%
+  mutate(possible=n()) %>%
+  summarise(observed=sum(switch_to_H_binom),
+            possible=first(possible))
+role_switchingBtoH$from<-"breeder"
+role_switchingBtoH$to<-"helper"
+role_switchingBtoH_NF<-data.frame(type="N_F",observed=0,possible=0,from="breeder",to="helper")
+role_switchingBtoH<-rbind(role_switchingBtoH,role_switchingBtoH_NF)
+
+role_switching<-rbind(role_switchingBtoH,role_switchingHtoB)
+
+role_switching<-role_switching %>%
+  mutate(type=ifelse(type=="I_F","immigrant female",type))%>%
+  mutate(type=ifelse(type=="I_M","immigrant male",type))%>%
+  mutate(type=ifelse(type=="N_M","resident male",type))%>%
+  mutate(type=ifelse(type=="N_F","resident female",type))
+
+# plot role switch events ####
+d<-role_switching
+d$ci.low <- NA
+d$ci.high <- NA
+d$proportion <- NA
+
+# add 95% CIs
+for (i in 1:nrow(d)) {
+  obs <- d$observed[i]
+  pos <- d$possible[i]
+  if(pos>0){
+    d$proportion[i] <- obs/pos
+    ci <- as.numeric(binom.test(x=obs, n= pos)$conf.int)
+    d$ci.low[i] <- ci[1]
+    d$ci.high[i] <- ci[2]
+  }
+}
+d
+
+# plot showing switches only
+(plot <-
+    d %>%
+    separate(type, into= c('dispersal', 'sex'), remove = F) %>%
+    mutate(name =paste(from, "to", to)) %>%
+    mutate(type = factor(type, levels= c("resident male", "resident female", "immigrant male", "immigrant female"))) %>%
+    mutate(proportion = round(proportion, 2)) %>%
+    mutate(label= paste0(observed, "/",possible)) %>%
+    ggplot(aes(y=name, x=proportion, color=sex, fill=sex ))+
+    facet_wrap(~type, ncol=1)+
+    geom_col(alpha=0.3)+
+    geom_errorbarh(aes(xmin= ci.low, xmax= ci.high), height=0.25)+
+    geom_point(shape= "square",size=2)+
+    geom_text(aes(x= proportion/2, label= label), color= 'black', hjust=1)+
+    coord_cartesian(xlim=c(0,1.02),expand=F)+
+    ylab("")+
+    xlab("proportion of individuals")+
+    scale_color_manual(values= c("red", "blue"))+
+    scale_fill_manual(values= c("red", "blue"))+
+    theme_classic()+
+    theme(
+      legend.position = 'none',
+      strip.background = element_blank(),
+      axis.text.y=element_text(size=10),
+      axis.text.x=element_text(size=10),
+      axis.title.y=element_text(size=10),
+      axis.title.x=element_text(size=12),
+      strip.text = element_text(size=12, hjust =0)))
+
+# save as PDF
+ggsave(
+  filename= 'Figure 3.pdf',
+  plot = plot,
+  scale = 1,
+  width = 8,
+  height = 4,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300)

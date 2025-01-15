@@ -1,6 +1,6 @@
-# Test of reciprocal helping bias and nepotism in helping decisions of superb starlings
+# A cryptic role for reciprocal helping in a cooperatively breeding bird
 # Alexis Earl, ade2102@columbia.edu
-# Gerry Carter, gcarter1640@gmail.com
+# Gerry Carter, gc1511@princeton.edu
 
 # Do helpers help kin nests more than they help nonkin nests when they have the option to help kin and nonkin simultaneously?
 
@@ -74,7 +74,7 @@ boot_ci2 <- function(d=d, y=d$y, x=d$x, perms=5000, bca=F){
   df
 }
 
-# get helping dyadic helping rates for immigrants and residents
+# get dyadic helping rates for immigrants and residents
 dr <-
   raw %>%
   mutate(kinship.max = ifelse(helper.dispersal=="I", microsat.kinship.max, kinship.max)) %>%
@@ -174,7 +174,7 @@ plot.rm <- custom_plot(type1= "resident male",color="darkblue", shape= "triangle
 
 # save plot to PDF
 ggsave(
-  "results/kin_v_nonkin.png",
+  "Figure 2.png",
   plot = plot1,
   width = 7,
   height = 7,
@@ -271,7 +271,7 @@ plot.rm2 <- custom_plot2(type1= "resident male",color="darkblue")
 
 # save plot to PDF
 ggsave(
-  "results/kin_v_nonkin_prob.png",
+  "Figure S3.png",
   plot = plot2,
   width = 7,
   height = 10,
@@ -341,7 +341,8 @@ for (i in 1:length(threshold.list)){
 # compile
 nonkin.help3 <- bind_rows(df.list3)
 
+
 # get range of probabilities
-nonkin.help3 %>% arrange(threshold) %>% pull(prob) %>% mean() #39%
+nonkin.help3 %>% arrange(threshold) %>% pull(prob) %>% mean() # 39%
 nonkin.help3 %>% arrange(desc(prob))
 

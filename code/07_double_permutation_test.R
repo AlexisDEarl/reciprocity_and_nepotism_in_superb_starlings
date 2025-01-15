@@ -1,13 +1,13 @@
-# Test of reciprocal helping bias and nepotism in helping decisions of superb starlings
+# A cryptic role for reciprocal helping in a cooperatively breeding bird
 # Alexis Earl, ade2102@columbia.edu
-# Gerry Carter, gcarter1640@gmail.com
+# Gerry Carter, gc1511@princeton.edu
 
-# double permutation test
+# This script runs a non-parametric "double permutation test" for testing reciprocal help while controlling for kinship (within each group)
 
 # clear workspace
 rm(list=ls())
 
-# get clock time (takes about 15 min on 2021 Macbook Pro with M1 chip)
+# get clock time (takes about 15 min on a 2021 Macbook Pro)
 start <- Sys.time()
 
 # load packages
@@ -73,8 +73,6 @@ boot_ci <- function(x, perms=5000, bca=F) {
 
 # get mean and 95% CIs via bootstrapping of values y within grouping variable x
 # argument 'bca = T' gives you bias-corrected and accelerated bootstrapping
-# get mean and 95% CIs via bootstrapping of values y within grouping variable x
-# argument 'bca = T' gives you bias-corrected and accelerated bootstrapping
 boot_ci2 <- function(d=d, y=d$y, x=d$x, perms=5000, bca=F){
   df <- data.frame(effect=unique(x))
   df$low <- NA
@@ -99,8 +97,6 @@ boot_ci2 <- function(d=d, y=d$y, x=d$x, perms=5000, bca=F){
   df
 }
 
-
-
 # set number of perms to use
 perms <- 5000
 
@@ -112,14 +108,14 @@ helpers <- d %>% pull(helper) %>% unique()
 moms <-  d %>% pull(mother) %>% unique()
 dads <-  d %>% pull(father) %>% unique()
 
-# get birds that could be both helpers and receivers
+# get individuals that could be both helpers and receivers
 birds_that_could_reciprocate <-
   data.frame(bird= c(helpers, moms, dads)) %>%
   filter(bird %in% helpers) %>%
   filter(bird %in% c(moms, dads)) %>%
   pull(bird)
 
-# get data from birds that could reciprocate?
+# get data from individuals that could reciprocate
 d2 <-
   d %>%
   filter(helper %in% birds_that_could_reciprocate) %>%
@@ -210,7 +206,6 @@ for (i in 1:length(groups)) {
 
  # get adjusted helping rates (difference between observed and expected (log counts))
     help2.m <- help.m - expected.help.m
-    #help2.m <- log(help.m+1) - log(expected.help.m+1)
 
   # get kinship matrix
   kinship.m <-
@@ -299,16 +294,15 @@ results
 # save results--------------
 (timestamp <- substr(gsub(x=gsub(":","",Sys.time()),
                          pattern=" ", replace="_"), start=1, stop=15))
-write.csv(results, file= paste("results/double.perm.test.results", timestamp, ".csv", sep=""))
+write.csv(results, file= paste("double.perm.test.results", timestamp, ".csv", sep=""))
 
-# results <- read.csv("results/double.perm.test.results2024-03-14_0940.csv")
+# results <- read.csv("double.perm.test.results2024-03-14_0940.csv")
 
-# save workspace (optional)
-if(FALSE){
-  save.image(file= paste("double_perm_workspace_", timestamp, ".Rdata", sep=""))
-}
+# save workspace
+save.image(file= paste("double_perm_workspace_", timestamp, ".Rdata", sep=""))
 
 # plot MRQAP results
+set.seed(123)
 (plot1a <-
     results %>%
     filter(test== "6. reciprocity in adjusted helping after controlling for kinship (MRQAP)") %>%
@@ -346,8 +340,11 @@ set.seed(123)
           strip.text = element_text(size=12, hjust=0),
           strip.background = element_blank()))
 
+# combine plots
 (plot1 <- plot1a+plot1b +  plot_layout(widths = c(7, 1)))
 
+# add more panels
+set.seed(123)
 (plot2a <-
     results %>%
     filter(test== "4. reciprocity in adjusted helping (Mantel test)") %>%
@@ -384,13 +381,15 @@ set.seed(123)
           axis.text=element_text(size=12),
           strip.text = element_text(size=12, hjust=0),
           strip.background = element_blank()))
-
+# combine
 (plot2 <- plot2a+plot2b +  plot_layout(widths = c(7, 1)))
 
+# combine again
 (plot <- plot2/plot1 +  plot_layout(heights = c(1, 2)) + plot_annotation(tag_levels= "A"))
 
+# save as PDF
 ggsave(
-  "results/permutation_tests.pdf",
+  "permutation_tests.pdf",
   plot = plot,
   scale = 1,
   width = 8,
@@ -398,8 +397,9 @@ ggsave(
   units = c("in", "cm", "mm", "px"),
   dpi = 600)
 
-# alternative plot----------------
+# improved plot----------------
 
+# get points for mantel tests
 points1 <-
   results %>%
   # label p-values to show
@@ -409,6 +409,7 @@ points1 <-
   filter(test== "4. reciprocity in adjusted helping (Mantel test)") %>%
   mutate(effect= "")
 
+# get means and bootstrapped 95% CIs for mantel tests
 (means1 <-
   points1 %>%
   # label p-values to show
@@ -430,6 +431,7 @@ points1 <-
            strip.text = element_text(size=12, hjust=0),
            strip.background = element_blank()))
 
+# repeat for MRQAP test
 points2 <-
   results %>%
   # label p-values to show
@@ -461,16 +463,17 @@ points2 <-
           strip.text = element_text(size=12, hjust=0),
           strip.background = element_blank()))
 
+# combine
 (aplot <- means1+means2 + plot_layout(guides= 'collect') + plot_annotation(tag_levels= "A"))
 
+# save as PDF
 ggsave(
-  "results/permutation_tests2.pdf",
+  "Figure S5.pdf",
   plot = aplot,
   width = 6,
   height = 5,
   units = c("in", "cm", "mm", "px"),
   dpi = 600)
-
 
 # get runtime of script
 end <- Sys.time()
