@@ -20,7 +20,7 @@ warmup_length = 1000
 
 # get helping observations
 d <-
-  read.csv("daily_helping.csv") %>%
+  read.csv("data/daily_helping.csv") %>%
   as_tibble() %>%
   # label helper-nest dyads
   mutate(helper_nest= paste(helper,nest)) %>%
@@ -121,5 +121,5 @@ d2 <-
   filter(term != "intercept")
 
 # save data
-write.csv(d2, file= "power_analysis_results.csv")
+write.csv(d2, file= "results/power_analysis_results.csv")
 

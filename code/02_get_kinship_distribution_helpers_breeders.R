@@ -14,8 +14,8 @@ getwd()
 library(tidyverse)
 
 # data
-dr <-read.csv("daily_helping.csv")
-dyads<-read.csv("dyads.csv")
+dr <-read.csv("data/daily_helping.csv")
+dyads<-read.csv("data/dyads.csv")
 
 # all individuals
 dr$parents<-paste(dr$father,dr$mother,sep=" ")
@@ -231,7 +231,7 @@ everything_plot<-grid.arrange(arrangeGrob(all_plot2,helper_type_plots,nrow=1,nco
 
 # save plot
 ggsave(
-  "breeder_helper_kinship_distribution.png",
+  "results/Figure S2.png",
   plot = everything_plot,
   width = 20,
   height = 10,

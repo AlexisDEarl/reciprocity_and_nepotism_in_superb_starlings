@@ -11,7 +11,7 @@ library(patchwork)
 library(brms)
 
 # get data--------------
-d2 <- read.csv("power_analysis_results.csv")
+d2 <- read.csv("results/power_analysis_results.csv")
 
 # remove models that failed to converge (CIs more than doubled from past season)
 d3 <-
@@ -54,7 +54,7 @@ d3 %>%
 
 # save plot
 ggsave(
-  "Figure 6.pdf",
+  "results/Figure 6.pdf",
   plot = pplot2,
   scale = 1,
   width = 4,

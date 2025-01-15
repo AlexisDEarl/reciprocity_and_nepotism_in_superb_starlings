@@ -486,7 +486,7 @@ d
 
 # save as PDF
 ggsave(
-  filename= 'Figure 3.pdf',
+  filename= 'results/Figure 3.pdf',
   plot = plot,
   scale = 1,
   width = 8,

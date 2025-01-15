@@ -31,7 +31,7 @@ warmup_length = 1000
 
 # get helping observations
 d <-
-  read.csv("daily_helping.csv") %>%
+  read.csv("data/daily_helping.csv") %>%
   as_tibble() %>%
   # label helper-nest dyads
   mutate(helper_nest= paste(helper,nest)) %>%
@@ -799,11 +799,11 @@ results <-
   )) %>%
   rename(Model = model, Sample = sample, Coefficient= name) %>%
   relocate(Model, Sample)
-write.csv(results, file= "model_terms.csv")
+write.csv(results, file= "results/model_terms.csv")
 
 # save posteriors for plotting
 save(all_post.kinship, all_post.reciprocity, all_post.reciprocity_kinship, all_post.interact,
-     file= "data_to_plot_model_estimates.Rdata")
+     file= "results/data_to_plot_model_estimates.Rdata")
 
 # OVERALL HELP RECEIVED (GENERALIZED RECIPROCITY) ####
 
@@ -811,7 +811,7 @@ save(all_post.kinship, all_post.reciprocity, all_post.reciprocity_kinship, all_p
 
 # get mean receiving rate for each individual
 t <-
-  read.csv("dyads.csv") %>%
+  read.csv("data/dyads.csv") %>%
   group_by(receiver) %>%
   summarize(mean.received= mean(help.rate, na.rm=T),
             total.received= sum(help.rate, na.rm=T)) %>%
@@ -819,7 +819,7 @@ t <-
 
 # get helping observations
 d3 <-
-  read.csv("daily_helping.csv") %>%
+  read.csv("data/daily_helping.csv") %>%
   as_tibble() %>%
   # label helper-nest dyads
   mutate(helper_nest= paste(helper,nest)) %>%
@@ -895,11 +895,11 @@ p2 <-
 post.gr <- rbind(p1,p2)
 
 # save posteriors for plotting
-save(post.gr, file= "data_to_plot_generalized_reciprocity.Rdata")
+save(post.gr, file= "results/data_to_plot_generalized_reciprocity.Rdata")
 
 # save results----------------
-write.csv(gr.results, file= "gr.model_terms.csv")
-gr.results <- read.csv("gr.model_terms.csv")
+write.csv(gr.results, file= "results/gr.model_terms.csv")
+gr.results <- read.csv("results/gr.model_terms.csv")
 
 # get runtime
 end <- Sys.time()
@@ -911,7 +911,7 @@ if(TRUE){
   timestamp <- substr(gsub(x=gsub(":","",Sys.time()),
                            pattern=" ", replace="_"), start=1, stop=15)
   timestamp
-  save.image(file= paste("model_workspace_", timestamp, ".Rdata", sep=""))
+  save.image(file= paste("results/model_workspace_", timestamp, ".Rdata", sep=""))
 }
 
 

@@ -101,7 +101,7 @@ boot_ci2 <- function(d=d, y=d$y, x=d$x, perms=5000, bca=F){
 perms <- 5000
 
 # get helping observations
-d <- read.csv("daily_helping.csv") %>% as_tibble()
+d <- read.csv("data/daily_helping.csv") %>% as_tibble()
 
 # get helpers and receivers
 helpers <- d %>% pull(helper) %>% unique()
@@ -294,12 +294,12 @@ results
 # save results--------------
 (timestamp <- substr(gsub(x=gsub(":","",Sys.time()),
                          pattern=" ", replace="_"), start=1, stop=15))
-write.csv(results, file= paste("double.perm.test.results", timestamp, ".csv", sep=""))
+write.csv(results, file= paste("results/double.perm.test.results", timestamp, ".csv", sep=""))
 
 # results <- read.csv("double.perm.test.results2024-03-14_0940.csv")
 
 # save workspace
-save.image(file= paste("double_perm_workspace_", timestamp, ".Rdata", sep=""))
+save.image(file= paste("results/double_perm_workspace_", timestamp, ".Rdata", sep=""))
 
 # plot MRQAP results
 set.seed(123)
@@ -389,7 +389,7 @@ set.seed(123)
 
 # save as PDF
 ggsave(
-  "permutation_tests.pdf",
+  "results/permutation_tests.pdf",
   plot = plot,
   scale = 1,
   width = 8,
@@ -468,7 +468,7 @@ points2 <-
 
 # save as PDF
 ggsave(
-  "Figure S5.pdf",
+  "results/Figure S5.pdf",
   plot = aplot,
   width = 6,
   height = 5,

@@ -13,7 +13,7 @@ library(boot)
 library(patchwork)
 
 # get helping rates
-raw <- read.csv(file="daily_helping.csv")
+raw <- read.csv(file="data/daily_helping.csv")
 
 # set colors and shapes
 colors <- c("red", "darkblue")

@@ -45,7 +45,7 @@ shapes <- c("circle", "square", "triangle")
 
 # save plot
 ggsave(
-  "Figure 1.pdf",
+  "results/Figure 1.pdf",
   plot = plot1,
   scale = 1,
   width = 4,
@@ -111,7 +111,7 @@ ggsave(
 # save plot
 (plot2and3 <- plot2/plot3 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1)))
 ggsave(
-  "Figure 4.pdf",
+  "results/Figure 4.pdf",
   plot = plot2and3,
   scale = 1,
   width = 5,
@@ -152,7 +152,7 @@ colors4 <- c("darkgrey","darkviolet", "red", "darkblue")
           strip.text = element_text(size=12, hjust=0),
           strip.background = element_blank()))
 ggsave(
-  "Figure S6.pdf",
+  "results/Figure S6.pdf",
   plot = plot3b,
   scale = 1,
   width = 5,
@@ -188,7 +188,7 @@ ggsave(
          strip.background = element_blank()))
 
 ggsave(
-  "Figure S4.pdf",
+  "results/Figure S4.pdf",
   plot = plot4,
   scale = 1,
   width = 5,
@@ -256,7 +256,7 @@ ggsave(
 
 # save as PDF
 ggsave(
-  "Figure 5.pdf",
+  "results/Figure 5.pdf",
   plot = plot5,
   scale = 1,
   width = 7.5,
