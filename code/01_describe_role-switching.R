@@ -473,7 +473,7 @@ d
     ylab("")+
     xlab("proportion of individuals")+
     scale_color_manual(values= c("red", "blue"))+
-    scale_fill_manual(values= c("red", "blue"))+
+    scale_fill_manual(values= c("pink", "deepskyblue"))+
     theme_classic()+
     theme(
       legend.position = 'none',
