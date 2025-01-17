@@ -42,7 +42,7 @@ d3 %>%
     geom_line(aes(y=Q97.5), size=0.8)+
     geom_line(size=1)+
     coord_cartesian(ylim= c(-2,2))+
-    ylab("regression coefficient estimate")+
+    ylab("regression coefficient")+
     xlab("number of sampled breeding seasons")+
     theme_classic()+
     theme(legend.position = c(0.75,0.3),
