@@ -11,6 +11,11 @@ rm(list=ls())
 load("results/data_to_plot_model_estimates_published.Rdata")
 load("results/data_to_plot_generalized_reciprocity.Rdata")
 
+# load packages
+library(tidyverse)
+library(ggplot2)
+library(ggdist)
+
 # set colors and shapes
 colors <- c("violet", "pink", "deepskyblue")
 colors2 <- c("darkviolet", "red", "darkblue")
