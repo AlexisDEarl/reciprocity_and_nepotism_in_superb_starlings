@@ -11,7 +11,7 @@ library(patchwork)
 library(brms)
 
 # get data--------------
-d2 <- read.csv("results/power_analysis_results.csv")
+d2 <- read.csv("results/power_analysis_results_published.csv")
 
 # remove models that failed to converge (CIs more than doubled from past season)
 d3 <-

@@ -8,8 +8,8 @@
 rm(list=ls())
 
 # load data from models
-load("data_to_plot_model_estimates.Rdata")
-load("data_to_plot_generalized_reciprocity.Rdata")
+load("results/data_to_plot_model_estimates_published.Rdata")
+load("results/data_to_plot_generalized_reciprocity.Rdata")
 
 # set colors and shapes
 colors <- c("violet", "pink", "deepskyblue")
