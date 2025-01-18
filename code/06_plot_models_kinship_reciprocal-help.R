@@ -13,8 +13,12 @@ load("results/data_to_plot_generalized_reciprocity.Rdata")
 
 # load packages
 library(tidyverse)
+library(performance)
+library(patchwork)
+library(rstan)
+library(brms)
+library(tidybayes)
 library(ggplot2)
-library(ggdist)
 
 # set colors and shapes
 colors <- c("violet", "pink", "deepskyblue")
