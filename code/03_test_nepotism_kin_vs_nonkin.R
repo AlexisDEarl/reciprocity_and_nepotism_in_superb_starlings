@@ -174,7 +174,7 @@ plot.rm <- custom_plot(type1= "resident male",color="darkblue", shape= "triangle
 
 # save plot to PDF
 ggsave(
-  "Figure 2.png",
+  "results/Figure 2.pdf",
   plot = plot1,
   width = 7,
   height = 7,
@@ -271,7 +271,7 @@ plot.rm2 <- custom_plot2(type1= "resident male",color="darkblue")
 
 # save plot to PDF
 ggsave(
-  "Figure S3.png",
+  "results/Figure S3.pdf",
   plot = plot2,
   width = 7,
   height = 10,

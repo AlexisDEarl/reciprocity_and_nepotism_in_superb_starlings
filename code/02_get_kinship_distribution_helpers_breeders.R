@@ -231,7 +231,7 @@ everything_plot<-grid.arrange(arrangeGrob(all_plot2,helper_type_plots,nrow=1,nco
 
 # save plot
 ggsave(
-  "results/Figure S2.png",
+  "results/Figure S2.pdf",
   plot = everything_plot,
   width = 20,
   height = 10,
