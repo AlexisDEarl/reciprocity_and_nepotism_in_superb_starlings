@@ -238,3 +238,11 @@ ggsave(
   units = "in",
   dpi = 600)
 
+# save as tiff
+ggsave(
+  "results/Figure S2.tiff",
+  plot = everything_plot,
+  width = 20,
+  height = 10,
+  units = "in",
+  dpi = 300)

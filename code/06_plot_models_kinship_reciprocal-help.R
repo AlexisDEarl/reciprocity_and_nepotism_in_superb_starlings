@@ -169,6 +169,16 @@ ggsave(
   units = c("in", "cm", "mm", "px"),
   dpi = 600)
 
+# save as tiff
+ggsave(
+  "results/Figure S6.tiff",
+  plot = plot3b,
+  scale = 1,
+  width = 5,
+  height = 4,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300)
+
 #### plot interaction between reciprocity and nepotism--------------------
 (plot4 <-
    all_post.interact %>%
@@ -204,6 +214,17 @@ ggsave(
   height = 4,
   units = c("in", "cm", "mm", "px"),
   dpi = 600)
+
+# save as tiff
+ggsave(
+  "results/Figure S4.tiff",
+  plot = plot4,
+  scale = 1,
+  width = 5,
+  height = 4,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300)
+
 
 # plot direct vs generalized reciprocity models -------------
 (plot5a <-

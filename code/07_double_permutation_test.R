@@ -423,8 +423,9 @@ points1 <-
     coord_cartesian(ylim= c(-0.25, 0.25))+
     scale_color_manual(values= c("darkgrey", "black"))+
      ylab("Pearson's correlation coefficient")+
-     xlab("given and received\nadjusted help scores ")+
-     theme_classic()+
+     #xlab("given and received\nadjusted help scores ")+
+    xlab("Mantel test results\n(across 9 social groups)")+
+    theme_classic()+
      theme(legend.position= 'none',
            axis.text.x= element_blank(),
            axis.text=element_text(size=12),
@@ -454,8 +455,10 @@ points2 <-
     geom_errorbar(aes(ymin=low, ymax=high, width=.1), position = position_nudge(x = 0.1), size=1)+
     coord_cartesian(ylim= c(-0.4, 0.4))+
     scale_color_manual(values= c("darkgrey", "black"))+
-    ylab("Beta coefficient")+
-    xlab("effect of adjusted help received\n when controlling for kinship")+
+    ylab("Standardized regression coefficient")+
+    xlab("MRQAP results\n(across 9 social groups)")+
+    # ylab("Beta coefficient")+
+    # xlab("effect of adjusted help received\n when controlling for kinship")+
     theme_classic()+
     theme(legend.position= 'none',
           axis.text.x= element_blank(),
@@ -474,6 +477,15 @@ ggsave(
   height = 5,
   units = c("in", "cm", "mm", "px"),
   dpi = 600)
+
+# save as tiff
+ggsave(
+  "results/Figure S5.tiff",
+  plot = aplot,
+  width = 6,
+  height = 5,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300)
 
 # get runtime of script
 end <- Sys.time()

@@ -278,6 +278,15 @@ ggsave(
   units = "in",
   dpi = 600)
 
+# save as tiff
+ggsave(
+  "results/Figure S3.tiff",
+  plot = plot2,
+  width = 7,
+  height = 10,
+  units = "in",
+  dpi = 300)
+
 # get range of probabilities
 nonkin.help2 %>% arrange(prob)
 nonkin.help2 %>% arrange(desc(prob))
