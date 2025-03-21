@@ -170,7 +170,7 @@ plot.rf <- custom_plot(type1= "resident female",color="red", shape= "triangle")
 plot.im <- custom_plot(type1="immigrant male",color="darkblue", shape= "square")
 plot.rm <- custom_plot(type1= "resident male",color="darkblue", shape= "triangle")
 
-(plot1 <- (plot.rm + plot.rf)/ (plot.im + plot.if) + plot_annotation(tag_levels = "A"))
+(plot1 <- (plot.rm + plot.rf)/ (plot.im + plot.if) + plot_annotation(tag_levels = "a"))
 
 # save plot to PDF
 ggsave(
@@ -267,7 +267,7 @@ plot.im2 <- custom_plot2(type1="immigrant male",color="darkblue")
 plot.rm2 <- custom_plot2(type1= "resident male",color="darkblue")
 
 
-(plot2 <- (plot.rm2 + plot.rf2)/ (plot.im2 + plot.if2) + plot_annotation(tag_levels = "A"))
+(plot2 <- (plot.rm2 + plot.rf2)/ (plot.im2 + plot.if2) + plot_annotation(tag_levels = "a"))
 
 # save plot to PDF
 ggsave(

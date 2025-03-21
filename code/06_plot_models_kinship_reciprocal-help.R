@@ -118,7 +118,7 @@ ggsave(
          strip.background = element_blank()))
 
 # save plot
-(plot2and3 <- plot2/plot3 + plot_annotation(tag_levels = 'A') + plot_layout(heights = c(1, 1)))
+(plot2and3 <- plot2/plot3 + plot_annotation(tag_levels = 'a') + plot_layout(heights = c(1, 1)))
 ggsave(
   "results/Figure 4.pdf",
   plot = plot2and3,
@@ -282,7 +282,7 @@ ggsave(
           strip.text = element_text(size=12, hjust=0),
           strip.background = element_blank()))
 
-(plot5 <- plot5a/plot5b + plot_annotation(tag_levels=c("A")))
+(plot5 <- plot5a/plot5b + plot_annotation(tag_levels=c("a")))
 
 # save as PDF
 ggsave(

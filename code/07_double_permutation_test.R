@@ -385,7 +385,7 @@ set.seed(123)
 (plot2 <- plot2a+plot2b +  plot_layout(widths = c(7, 1)))
 
 # combine again
-(plot <- plot2/plot1 +  plot_layout(heights = c(1, 2)) + plot_annotation(tag_levels= "A"))
+(plot <- plot2/plot1 +  plot_layout(heights = c(1, 2)) + plot_annotation(tag_levels= "a"))
 
 # save as PDF
 ggsave(
@@ -467,7 +467,7 @@ points2 <-
           strip.background = element_blank()))
 
 # combine
-(aplot <- means1+means2 + plot_layout(guides= 'collect') + plot_annotation(tag_levels= "A"))
+(aplot <- means1+means2 + plot_layout(guides= 'collect') + plot_annotation(tag_levels= "a"))
 
 # save as PDF
 ggsave(

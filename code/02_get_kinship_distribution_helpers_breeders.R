@@ -87,10 +87,10 @@ kinship.means <- dr1 %>%
   summarize(kinship.mean = mean(microsat.kinship.max,na.rm=TRUE),n=n())
 
 ABCD <- c(
-  "N_M" = "\nA\n ",
-  "I_M" = "\nB\n",
-  "N_F" = "\nC\n",
-  "I_F" = "\nD\n"
+  "N_M" = "\na\n ",
+  "I_M" = "\nb\n",
+  "N_F" = "\nc\n",
+  "I_F" = "\nd\n"
 )
 
 dr1_N_F<-dr1%>%filter(type=="N_F")
@@ -208,7 +208,7 @@ I_F_plot1<-I_F_plot+coord_cartesian(xlim = c(-0.25,1.0))
 
 # combine plots
 helper_type_plot_list<-list(N_M_plot1,I_M_plot1,N_F_plot1,I_F_plot1)
-helper_type_plots<-plot_grid(plotlist=helper_type_plot_list, nrow = 2,ncol=2,labels=c("B","C","D", "E"), label_fontfamily = "serif", label_fontface = "bold",label_size =24)
+helper_type_plots<-plot_grid(plotlist=helper_type_plot_list, nrow = 2,ncol=2,labels=c("b","c","d", "e"), label_fontfamily = "serif", label_fontface = "bold",label_size =24)
 
 # create common x and y labels
 y.grob <- textGrob("\n number of helpers \n",
@@ -224,7 +224,7 @@ grid.arrange(arrangeGrob(helper_type_plots, left = y.grob, bottom = x.grob))
 # expand xlim so same as other plots
 all_plot1<-all_plot+coord_cartesian(xlim = c(-0.25,1.0))
 # add label
-all_plot2<-plot_grid(plotlist=list(all_plot1), nrow = 1,ncol=1,labels=c("A"),label_size =24, label_fontfamily = "serif", label_x = 0,
+all_plot2<-plot_grid(plotlist=list(all_plot1), nrow = 1,ncol=1,labels=c("a"),label_size =24, label_fontfamily = "serif", label_x = 0,
                      hjust = 0.5)
 # combine
 everything_plot<-grid.arrange(arrangeGrob(all_plot2,helper_type_plots,nrow=1,ncol=2, left = y.grob, bottom = x.grob))
