@@ -1,4 +1,4 @@
-Data and analysis scripts for the manuscript "A cryptic role for reciprocal helping in a cooperatively breeding bird"
+Data and analysis scripts for the manuscript "A cryptic role for reciprocal helping in a cooperatively breeding bird" published in [Nature](https://doi.org/10.1038/s41586-025-08958-4) (2025).
 
 **Authors**: [Alexis D. Earl](https://scholar.google.com/citations?hl=en&user=Yc4sb7cAAAAJ&view_op=list_works&sortby=pubdate), [Gerald G. Carter](https://scholar.google.com/citations?user=jtRkzp0AAAAJ&hl=en&oi=sra), [Arden G. Berlinger](https://www.linkedin.com/in/arden-berlinger-38735b156/?originalSubdomain=uk), Elkana Korir, [Shailee S. Shah](https://scholar.google.com/citations?hl=en&user=0lmbv34AAAAJ&view_op=list_works&sortby=pubdate), Wilson N. Watetu & [Dustin R. Rubenstein](https://scholar.google.com/citations?user=Wsh4RjcAAAAJ&hl=en&oi=sra)
 
